@@ -1,12 +1,12 @@
-const crypto = require("crypto");
-require("dotenv").config();
+const crypto = require('crypto');
 
-// 비밀번호 해싱 함수
 const hashPassword = (password, salt) => {
-  const hashedPassword = crypto
-    .pbkdf2Sync(password, salt, 10000, 64, "sha512")
-    .toString("hex");
-  return hashedPassword;
+  return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
 };
 
-module.exports = { hashPassword };
+const comparePassword = (inputPassword, storedPassword, salt) => {
+  const hashedInputPassword = hashPassword(inputPassword, salt);
+  return hashedInputPassword === storedPassword;
+};
+
+module.exports = { hashPassword, comparePassword };
