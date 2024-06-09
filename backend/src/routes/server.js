@@ -6,17 +6,14 @@ const passport = require('passport');
 const session = require('express-session');
 const authRouter = require('./authRouter');
 const profileRouter = require('./profileRouter');
-
 const virtualCompilerRouter = require('./virtualCompilerRouter');
 const signUpRouter = require("./signUpRouter");
 const loginRouter = require("./loginRouter");
 const mypageRouter = require("./mypageRouter");
 
-
 require('../../config/passport-setup'); // 경로 수정
-require('dotenv').config({ path: './src/routes/.env' });
+dotenv.config({ path: './src/routes/.env' });
 
-dotenv.config();
 const app = express();
 
 app.use(cors());
