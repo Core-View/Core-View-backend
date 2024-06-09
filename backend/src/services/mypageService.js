@@ -1,15 +1,15 @@
 const pool = require('../../config/databaseSet');
 
 class UserService {
-  async getUserInfoByUsername(username) {
+  async getUserById(userId) {
     try {
-      const connection = await pool.getConnection();
-      const [rows] = await connection.query("SELECT username, email, password FROM users WHERE username = ?", [username]);
-      connection.release();
-      return rows[0];
-    } catch (error) {
-      console.error("Error fetching user information:", error);
-      throw error;
+      const [rows] = await pool.query('SELECT * FROM user WHERE user_id = ?', [userId]);
+      if (rows.length > 0) {
+        return rows[0];
+      }
+      throw new Error('User not found');
+    } catch (err) {
+      throw err;
     }
   }
 }
