@@ -11,7 +11,7 @@ const virtualCompilerRouter = require('./virtualCompilerRouter');
 const signUpRouter = require("./signUpRouter");
 const loginRouter = require("./loginRouter");
 const mypageRouter = require("./mypageRouter");
-
+const passwordRouter = require('./passwordRouter');
 
 require('../../config/passport-setup'); // 경로 수정
 require('dotenv').config({ path: './src/routes/.env' });
@@ -37,7 +37,7 @@ app.use('/api', virtualCompilerRouter);
 app.use("/mypage", mypageRouter);
 app.use('/auth', authRouter);
 app.use('/', profileRouter);
-
+app.use('/password', passwordRouter);
 console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
 app.listen(3000, () => {
   console.log('Server is running on port 3000');

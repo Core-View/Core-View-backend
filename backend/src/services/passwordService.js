@@ -1,24 +1,39 @@
-// passwordService.js
+const pool = require('../../config/databaseSet');
+const { hashPassword } = require('../utils/cryptoUtils');
 
-const userService = require('../services/userService');
+class PasswordService {
+    async verifyPassword(userId, password) {
+        try {
+            const connection = await pool.getConnection();
 
-async function verifyPassword(userId, password) {
-    try {
-        const user = await userService.getUserById(userId); // 사용자 정보 가져오기
-        if (!user) {
-            return { success: false, error: "User not found" };
+            // 사용자 정보 조회
+            const [userRows] = await connection.query(
+                "SELECT user_id, user_password, user_salt FROM user WHERE user_id = ?", 
+                [userId]
+            );
+
+            connection.release();
+
+            if (userRows.length === 0) {
+                return { success: false, error: "User not found" };
+            }
+
+            const user = userRows[0];
+
+            // 저장된 salt와 암호화된 비밀번호를 이용하여 비밀번호 일치 여부 확인
+            const hashedPassword = hashPassword(password, user.user_salt);
+            const isMatch = user.user_password === hashedPassword;
+
+            if (isMatch) {
+                return { success: true, message: "Password verified" };
+            } else {
+                return { success: false, error: "Incorrect password" };
+            }
+        } catch (error) {
+            console.error("Error verifying password:", error);
+            throw error;
         }
-
-        // 비밀번호 검증 로직 (여기서는 단순히 비교만)
-        if (password === user.user_password) {
-            return { success: true, message: "Password verified" };
-        } else {
-            return { success: false, error: "Incorrect password" };
-        }
-    } catch (error) {
-        console.error("Error verifying password:", error);
-        throw error;
     }
 }
 
-module.exports = { verifyPassword };
+module.exports = new PasswordService();
