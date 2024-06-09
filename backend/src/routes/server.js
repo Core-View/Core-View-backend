@@ -1,21 +1,28 @@
 const express = require("express");
-const session = require('express-session');
+const cors = require("cors");
+const dotenv = require("dotenv");
+const bodyParser = require('body-parser');
 const passport = require('passport');
-const cors = require('cors');
-require('./../../config/passport-setup'); // 경로를 맞게 설정해주세요
+const session = require('express-session');
 const authRouter = require('./authRouter');
-const mypageRouter = require('./mypageRouter');
+const profileRouter = require('./profileRouter');
+const virtualCompilerRouter = require('./virtualCompilerRouter');
+const signUpRouter = require("./signUpRouter");
+const loginRouter = require("./loginRouter");
+const mypageRouter = require("./mypageRouter");
+
+dotenv.config({ path: './src/routes/.env' });
+require('../../config/passport-setup');
 
 const app = express();
 
-// CORS 설정 추가
-app.use(cors({
-  origin: 'http://localhost:3000', // 프론트엔드 도메인
-  credentials: true
-}));
+// 모든 출처 허용 (CORS 설정)
+app.use(cors());
+
+app.use(bodyParser.json());
 
 app.use(session({
-  secret: 'your-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true
 }));
@@ -23,8 +30,12 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/sign", signUpRouter);
+app.use("/login", loginRouter);
+app.use('/api', virtualCompilerRouter);
+app.use("/mypage", mypageRouter);
 app.use('/auth', authRouter);
-app.use('/', mypageRouter);
+app.use('/', profileRouter);
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');

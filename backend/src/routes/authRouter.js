@@ -9,6 +9,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
+    // 로그인 성공 시 리다이렉트할 경로 설정
     res.redirect('/mypage');
   });
 

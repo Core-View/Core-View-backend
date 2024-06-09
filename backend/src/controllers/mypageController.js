@@ -6,7 +6,6 @@ class UserController {
     try {
       const userInfo = await userService.getUserInfoByUsername(username);
       res.json(userInfo);
-     
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Error fetching user information" });
