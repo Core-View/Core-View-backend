@@ -1,3 +1,4 @@
+// src/routes/server.js
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -10,6 +11,9 @@ const virtualCompilerRouter = require('./virtualCompilerRouter');
 const signUpRouter = require("./signUpRouter");
 const loginRouter = require("./loginRouter");
 const mypageRouter = require("./mypageRouter");
+const postRouter = require("./postRouter");
+const top3PostsRouter = require("./top3PostsRouter"); // 추가
+const top3FeedbackRouter = require("./top3FeedbackRouter"); // 추가
 
 require('../../config/passport-setup'); // 경로 수정
 dotenv.config({ path: './src/routes/.env' });
@@ -34,6 +38,9 @@ app.use('/api', virtualCompilerRouter);
 app.use("/mypage", mypageRouter);
 app.use('/auth', authRouter);
 app.use('/', profileRouter);
+app.use("/post", postRouter); 
+app.use("/top3posts", top3PostsRouter); 
+app.use("/", top3FeedbackRouter); 
 
 console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
 app.listen(3000, () => {
