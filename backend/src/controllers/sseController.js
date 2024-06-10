@@ -1,12 +1,15 @@
 const fs = require('fs');
 const path = require('path');
+const alarmService = require("../services/alarmService");
 
 class SSEController {
     constructor() {
         this.cancelStreaming = false;
     }
 
-    subscribe(req, res) {
+    async subscribe(req, res) {
+        let user_id = 1;
+
         const headers = {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'text/event-stream',
@@ -16,16 +19,29 @@ class SSEController {
 
         res.writeHead(200, headers);
 
-        this._sendMessage(res);
-    };
+        // 파일 변경 감지
+        fs.watch("../../config/alarm.txt", async (eventType, filename) => {
+            if (filename) {
+                console.log(`${filename} 파일에 ${eventType} 이벤트가 발생했습니다.`);
+                let result = await alarmService.getAlarm(user_id);
+                this._sendMessage(res, result);
+            } else {
+                console.log('파일 변경 감지: 파일 이름을 얻을 수 없습니다.');
+            }
+        });
+
+        let result = await alarmService.getAlarm(user_id);
+
+        // 초기 메시지 전송
+        this._sendMessage(res, result);
+    }
 
     unsubscribe(res) {
         this.cancelStreaming = true;
-
         res.send(`<html><body>Streaming is cancelled.</body></html>`);
     }
 
-    _sendMessage(res) {
+    _sendMessage(res, result) {
         if (this.cancelStreaming) {
             res.end();
             this.cancelStreaming = false;
@@ -35,19 +51,12 @@ class SSEController {
         console.log('[sse] sendMessage');
 
         res.write('event: message\n');
-        res.write('data: 안녕\n\n');
-
-        const timer = setTimeout(() => {
-            res.write('event: message\n');
-            res.write('data: finished\n\n');
-            res.end();
-            clearTimeout(timer);
-        }, 1000);
+        res.write(`data: ${JSON.stringify(result)}\n\n`);
     }
 
     fileWrite(data) {
         const filePath = path.resolve(__dirname, '../../config/alarm.txt');
-        fs.writeFile(filePath, `${data}`, 'utf8', function(error){
+        fs.writeFile(filePath, `${data}`, 'utf8', function (error) {
             if (error) {
                 console.error('Error writing file:', error);
             } else {
