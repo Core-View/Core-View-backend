@@ -58,4 +58,15 @@ const updateNotice = async (req, res) => {
     }
 }
 
-module.exports = {getNotice, getDetail, deleteNotice, updateNotice}
+const postNotice = async (req, res) => {
+    let sql = `INSERT INTO NOTICE (NOTICE_TITLE, NOTICE_CONTENT, NOTICE_DATE) VALUES (?,?, NOW())`;
+
+    try{
+        const [result] = await pool.query(sql, [req.body.title, req.body.content]);
+        res.status(200).send({success: true});
+    }catch (error) {
+        console.log(error);
+        res.status(500).send({success: false, message: "잠시후 다시 시도해주세요"});
+    }
+}
+module.exports = {getNotice, getDetail, deleteNotice, updateNotice, postNotice}

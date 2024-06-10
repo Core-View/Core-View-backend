@@ -14,4 +14,11 @@ router.delete("/delete", noticeController.noticeDelete);
 //수정
 router.patch("/post", noticeController.noticeModify);
 
+//작성
+router.post("/post", noticeController.noticePost);
+
+//이미지 첨부
+// router.post("image", upload.single('image'), (req, res) => {
+//     res.status(200).json(req.file); //파일 경로 전송
+// })
 module.exports = router;

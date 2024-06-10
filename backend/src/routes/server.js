@@ -12,7 +12,7 @@ const signUpRouter = require("./signUpRouter");
 const loginRouter = require("./loginRouter");
 const mypageRouter = require("./mypageRouter");
 const noticeRouter = require("./noticeRouter");
-
+const alarmRouter = require('./alarmRouter');
 require('../../config/passport-setup'); // 경로 수정
 require('dotenv').config({ path: './src/routes/.env' });
 
@@ -38,9 +38,10 @@ app.use("/mypage", mypageRouter);
 app.use('/auth', authRouter);
 app.use('/', profileRouter);
 app.use('/notice', noticeRouter); //공지 관련 라우터
-
+app.use('/sse/streaming',alarmRouter ); //알림
 
 console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
+
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
