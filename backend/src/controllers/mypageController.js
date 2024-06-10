@@ -27,7 +27,8 @@ class UserController {
     }
 
     try {
-      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null); // Pass null for image data
+      // Modify user info without image
+      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
       res.json(updatedUserInfo);
     } catch (error) {
       console.error("사용자 정보 수정 중 에러 발생:", error);
@@ -57,7 +58,6 @@ class UserController {
       const updatedUserImage = await userService.modifyUserImage(user_id, imageFileName);
       
       // 이미지 업로드 후, 기존 이미지 삭제 (옵션)
-      // 기존 사용자 프로필 사진 경로를 받아서 삭제
       if (updatedUserImage.previous_image_path) {
         const previousImagePath = path.join(__dirname, '../../uploads/', updatedUserImage.previous_image_path);
         await fs.promises.unlink(previousImagePath);
@@ -72,7 +72,6 @@ class UserController {
       res.status(500).json({ message: "사용자 이미지 수정 중 에러 발생" });
     }
   }
-  
 
   async deleteUser(req, res) {
     const user_id = req.params.user_id;
