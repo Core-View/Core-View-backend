@@ -74,3 +74,22 @@ exports.getPostsByLikes = async (req, res) => {
     res.status(500).json({ error: 'Database error' });
   }
 };
+
+// 최근 게시물 중에서 최신 3개를 가져오는 함수
+exports.getRecent3Posts = async (req, res) => {
+  const sqlQuery = `
+    SELECT * 
+    FROM post 
+    ORDER BY post_date DESC
+    LIMIT 3
+  `;
+
+  try {
+    console.log('Executing query:', sqlQuery);
+    const [results] = await db.pool.query(sqlQuery);
+    res.json(results);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+};

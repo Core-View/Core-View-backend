@@ -16,4 +16,7 @@ router.get('/popularPosts', postController.getPostsByLikes);
 // 좋아요를 추가하는 라우트
 router.post('/likePost', postController.likePost);
 
+// 최근 게시물 중에서 최신 3개를 가져오는 라우트
+router.get('/recentPosts', postController.getRecent3Posts);
+
 module.exports = router;

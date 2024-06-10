@@ -1,13 +1,19 @@
 // src/controllers/postController.js
-const db = require('../../config/databaseSet'); // 올바른 경로와 파일명
+const db = require('../../config/databaseSet');
 
-// 상위 3개의 좋아요를 받은 게시물을 가져오는 함수
+// 최근 2주간의 게시물 중에서 좋아요가 많은 상위 3개를 가져오는 함수
 exports.getTop3Posts = async (req, res) => {
+  const twoWeeksAgo = new Date();
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+  const twoWeeksAgoFormatted = twoWeeksAgo.toISOString().split('T')[0];
+
   const sqlQuery = `
-    SELECT post_id, COUNT(*) AS total_likes 
-    FROM post_likes 
-    GROUP BY post_id 
-    ORDER BY total_likes DESC 
+    SELECT p.*, COUNT(pl.post_id) AS total_likes 
+    FROM post p
+    LEFT JOIN post_likes pl ON p.post_id = pl.post_id
+    WHERE p.post_date >= '${twoWeeksAgoFormatted}'
+    GROUP BY p.post_id 
+    ORDER BY total_likes DESC
     LIMIT 3
   `;
 

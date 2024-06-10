@@ -16,14 +16,14 @@ function runCCode(code) {
         compiler.on('close', (code) => {
             if (code === 0) {
                 const c_program = spawn(outputFilePath);
-                const result = [];
+                let result = '';
 
                 c_program.stdout.on('data', (data) => {
-                    result.push(data.toString());
+                    result += data.toString() + '\n'; // 줄별로 구분하여 추가
                 });
 
                 c_program.on('close', () => {
-                    resolve(result.join(''));
+                    resolve(result);
                 });
             } else {
                 reject('Compilation failed');
@@ -48,14 +48,14 @@ function runCppCode(code) {
         compiler.on('close', (code) => {
             if (code === 0) {
                 const cpp_program = spawn(outputFilePath);
-                const result = [];
+                let result = '';
 
                 cpp_program.stdout.on('data', (data) => {
-                    result.push(data.toString());
+                    result += data.toString() + '\n'; // 줄별로 구분하여 추가
                 });
 
                 cpp_program.on('close', () => {
-                    resolve(result.join(''));
+                    resolve(result);
                 });
             } else {
                 reject('Compilation failed');
@@ -81,14 +81,14 @@ function runJavaCode(code) {
         compiler.on('close', (code) => {
             if (code === 0) {
                 const java_program = spawn('java', ['-classpath', outputDir, 'Main']);
-                const result = [];
+                let result = '';
 
                 java_program.stdout.on('data', (data) => {
-                    result.push(data.toString());
+                    result += data.toString() + '\n'; // 줄별로 구분하여 추가
                 });
 
                 java_program.on('close', () => {
-                    resolve(result.join(''));
+                    resolve(result);
                 });
             } else {
                 reject('Compilation failed');
@@ -105,14 +105,14 @@ function runJavaCode(code) {
 function runPythonCode(code) {
     return new Promise((resolve, reject) => {
         const python_program = spawn('python3', ['-c', code]);
-        const result = [];
+        let result = '';
 
         python_program.stdout.on('data', (data) => {
-            result.push(data.toString());
+            result += data.toString() + '\n'; // 줄별로 구분하여 추가
         });
 
         python_program.on('close', () => {
-            resolve(result.join(''));
+            resolve(result);
         });
 
         python_program.stderr.on('data', (data) => {
