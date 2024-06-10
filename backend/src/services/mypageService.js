@@ -86,6 +86,15 @@ class UserService {
       );
 
       const previous_image_path = previousImageRows[0].user_image;
+
+      // 기존 이미지가 존재하면 삭제
+      if (previous_image_path) {
+        // 이미지 파일 경로 생성
+        const previousImagePath = path.join(__dirname, '../../uploads/', previous_image_path);
+
+        // 파일 삭제
+        await fs.promises.unlink(previousImagePath);
+      }
   
       const [result] = await connection.query(
         "UPDATE user SET user_image = ? WHERE user_id = ?", 
