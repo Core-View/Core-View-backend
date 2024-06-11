@@ -1,7 +1,7 @@
 const pool = require('../../config/databaseSet');
 const { formatDateToISOString } = require('../utils/dateUtil');
 
-// Feedback 서비스 함수 정의
+// 새로운 피드백 생성
 exports.createFeedback = async (data) => {
   const { post_id, user_id, feedback_comment, feedback_codenumber } = data;
   const feedback_date = formatDateToISOString(new Date()); // 현재 시간을 가져와서 ISO 형식 문자열로 변환합니다.
@@ -18,6 +18,7 @@ exports.createFeedback = async (data) => {
   }
 };
 
+// 모든 피드백 조회
 exports.getAllFeedbacks = async () => {
   const query = `SELECT * FROM feedback`;
   try {
@@ -29,6 +30,7 @@ exports.getAllFeedbacks = async () => {
   }
 };
 
+// 특정 피드백 조회
 exports.getFeedbackById = async (id) => {
   const query = `SELECT * FROM feedback WHERE feedback_id = ?`;
   try {
@@ -40,6 +42,7 @@ exports.getFeedbackById = async (id) => {
   }
 };
 
+// 피드백 수정
 exports.updateFeedback = async (id, data) => {
   const { post_id, user_id, feedback_date, feedback_comment, feedback_codenumber } = data;
   const query = `
@@ -56,6 +59,7 @@ exports.updateFeedback = async (id, data) => {
   }
 };
 
+// 피드백 삭제
 exports.deleteFeedback = async (id) => {
   const query = `DELETE FROM feedback WHERE feedback_id = ?`;
   try {
@@ -67,6 +71,7 @@ exports.deleteFeedback = async (id) => {
   }
 };
 
+// 피드백 좋아요 생성
 exports.createFeedbackLike = async (data) => {
   const { user_id, feedback_id } = data;
   const query = `
@@ -82,6 +87,7 @@ exports.createFeedbackLike = async (data) => {
   }
 };
 
+// 피드백 좋아요 삭제
 exports.deleteFeedbackLike = async (id) => {
   const query = `DELETE FROM feedback_likes WHERE feedbacklike_id = ?`;
   try {

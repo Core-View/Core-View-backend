@@ -1,6 +1,7 @@
 const feedbackService = require('../services/feedbackService');
 const { handleResponse } = require('../utils/responseUtil');
 
+// 피드백 생성
 exports.createFeedback = async (req, res) => {
     try {
         const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
@@ -13,6 +14,7 @@ exports.createFeedback = async (req, res) => {
     }
 };
 
+// 모든 피드백 조회
 exports.getAllFeedbacks = async (req, res) => {
     try {
         const feedbacks = await feedbackService.getAllFeedbacks();
@@ -23,11 +25,12 @@ exports.getAllFeedbacks = async (req, res) => {
     }
 };
 
+// 특정 피드백 조회
 exports.getFeedbackById = async (req, res) => {
     try {
         const feedback = await feedbackService.getFeedbackById(req.params.id);
         if (!feedback) {
-            return handleResponse(res, 404, null, new Error('Feedback not found'));
+            return handleResponse(res, 404, { error: 'Feedback not found' });
         }
         handleResponse(res, 200, feedback);
     } catch (error) {
@@ -36,11 +39,12 @@ exports.getFeedbackById = async (req, res) => {
     }
 };
 
+// 피드백 수정
 exports.updateFeedback = async (req, res) => {
     try {
         const feedback = await feedbackService.updateFeedback(req.params.id, req.body);
-        if (!feedback.affectedRows) {
-            return handleResponse(res, 404, null, new Error('Feedback not found'));
+        if (!feedback) {
+            return handleResponse(res, 404, { error: 'Feedback not found' });
         }
         handleResponse(res, 200, feedback);
     } catch (error) {
@@ -49,11 +53,12 @@ exports.updateFeedback = async (req, res) => {
     }
 };
 
+// 피드백 삭제
 exports.deleteFeedback = async (req, res) => {
     try {
         const feedback = await feedbackService.deleteFeedback(req.params.id);
-        if (!feedback.affectedRows) {
-            return handleResponse(res, 404, null, new Error('Feedback not found'));
+        if (!feedback) {
+            return handleResponse(res, 404, { error: 'Feedback not found' });
         }
         handleResponse(res, 200, feedback);
     } catch (error) {
@@ -62,6 +67,7 @@ exports.deleteFeedback = async (req, res) => {
     }
 };
 
+// 피드백 좋아요 생성
 exports.createFeedbackLike = async (req, res) => {
     try {
         const feedbackLike = await feedbackService.createFeedbackLike(req.body);
@@ -72,11 +78,12 @@ exports.createFeedbackLike = async (req, res) => {
     }
 };
 
+// 피드백 좋아요 삭제
 exports.deleteFeedbackLike = async (req, res) => {
     try {
         const feedbackLike = await feedbackService.deleteFeedbackLike(req.params.id);
-        if (!feedbackLike.affectedRows) {
-            return handleResponse(res, 404, null, new Error('Feedback like not found'));
+        if (!feedbackLike) {
+            return handleResponse(res, 404, { error: 'Feedback like not found' });
         }
         handleResponse(res, 200, feedbackLike);
     } catch (error) {
