@@ -13,10 +13,9 @@ async function(token, tokenSecret, profile, done) {
     if (rows.length > 0) {
       return done(null, rows[0]);
     } else {
-      // 기본 비밀번호와 기본 salt, 기본 역할 값을 설정
-      const defaultPassword = "default_password";  // 이 값을 적절히 변경하세요
-      const defaultSalt = "default_salt";  // 이 값을 적절히 변경하세요
-      const defaultRole = 0;  // 일반 사용자 역할
+      const defaultPassword = "default_password";
+      const defaultSalt = "default_salt";
+      const defaultRole = 0;
       const [result] = await pool.query('INSERT INTO user (user_name, user_nickname, user_email, user_password, user_salt, role) VALUES (?, ?, ?, ?, ?, ?)', 
         [profile.displayName, profile.displayName, profile.emails[0].value, defaultPassword, defaultSalt, defaultRole]);
       const [newUser] = await pool.query('SELECT * FROM user WHERE user_email = ?', [profile.emails[0].value]);
@@ -43,3 +42,5 @@ passport.deserializeUser(async (id, done) => {
     done(err, null);
   }
 });
+
+module.exports = passport;

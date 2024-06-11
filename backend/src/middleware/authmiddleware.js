@@ -2,18 +2,14 @@ const session = require('express-session');
 
 // 세션 미들웨어 설정
 const sessionMiddleware = session({
-  secret: 'your_secret_key',
+  secret: process.env.SESSION_SECRET || 'your_secret_key', // 환경변수 설정 추가
   resave: false,
   saveUninitialized: false
 });
 
-// 미들웨어 함수
+// 인증 미들웨어 함수 (인증 검사를 우회하도록 수정)
 const authenticateSession = (req, res, next) => {
-  if (req.session.passport && req.session.passport.user) {
-    next();
-  } else {
-    res.status(401).send('인증이 필요합니다.');
-  }
+  next(); // 인증 검사를 우회하고 다음 미들웨어로 넘어가게 설정
 };
 
 module.exports = {
