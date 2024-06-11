@@ -1,4 +1,5 @@
 // src/controllers/postController.js
+
 const db = require('../../config/databaseSet');
 
 // 포스트 제목으로 검색하는 함수
@@ -81,6 +82,59 @@ exports.getRecent3Posts = async (req, res) => {
     SELECT * 
     FROM post 
     ORDER BY post_date DESC
+    LIMIT 3
+  `;
+
+  try {
+    console.log('Executing query:', sqlQuery);
+    const [results] = await db.pool.query(sqlQuery);
+    res.json(results);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+};
+
+// 사용자 기여도를 가져오는 함수
+exports.getUserContribution = async (req, res) => {
+  const { user_id } = req.body;
+
+  const sqlQuery = `
+    SELECT 
+      u.user_id, 
+      IFNULL(SUM(pl.post_id IS NOT NULL), 0) AS post_likes, 
+      IFNULL(SUM(fl.feedback_id IS NOT NULL), 0) AS feedback_likes, 
+      (IFNULL(SUM(pl.post_id IS NOT NULL), 0) + IFNULL(SUM(fl.feedback_id IS NOT NULL), 0)) AS total_contribution 
+    FROM user u 
+    LEFT JOIN post_likes pl ON u.user_id = pl.user_id 
+    LEFT JOIN feedback_likes fl ON u.user_id = fl.user_id 
+    WHERE u.user_id = ? 
+    GROUP BY u.user_id
+  `;
+
+  try {
+    console.log('Executing query:', sqlQuery);
+    const [results] = await db.pool.query(sqlQuery, [user_id]);
+    res.json(results);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+};
+
+// 기여도가 높은 상위 3명의 사용자를 가져오는 함수
+exports.getTop3Contributors = async (req, res) => {
+  const sqlQuery = `
+    SELECT 
+      u.user_id, 
+      IFNULL(SUM(pl.post_id IS NOT NULL), 0) AS post_likes, 
+      IFNULL(SUM(fl.feedback_id IS NOT NULL), 0) AS feedback_likes, 
+      (IFNULL(SUM(pl.post_id IS NOT NULL), 0) + IFNULL(SUM(fl.feedback_id IS NOT NULL), 0)) AS total_contribution 
+    FROM user u 
+    LEFT JOIN post_likes pl ON u.user_id = pl.user_id 
+    LEFT JOIN feedback_likes fl ON u.user_id = fl.user_id 
+    GROUP BY u.user_id
+    ORDER BY total_contribution DESC
     LIMIT 3
   `;
 

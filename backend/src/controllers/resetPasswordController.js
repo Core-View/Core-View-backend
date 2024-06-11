@@ -1,7 +1,9 @@
+// controllers/resetPasswordController.js
+
 const { pool } = require('../../config/databaseSet');
-const bcrypt = require('bcryptjs');
 const { sendMail } = require('./mailer');
-const signUpService = require('../services/signUpService');
+const { hashPassword } = require('../utils/cryptoUtils');
+const crypto = require("crypto");
 
 let resetCode; // 전역 변수로 resetCode 저장
 
@@ -51,9 +53,10 @@ const resetPassword = async (req, res) => {
     const { user_email, new_password } = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(new_password, 10);
+        const salt = crypto.randomBytes(16).toString("hex");
+        const hashedPassword = hashPassword(new_password, salt);
 
-        await pool.query('UPDATE user SET user_password = ? WHERE user_email = ?', [hashedPassword, user_email]);
+        await pool.query('UPDATE user SET user_password = ?, salt = ? WHERE user_email = ?', [hashedPassword, salt, user_email]);
 
         resetCode = null; // 인증 코드 초기화
 
