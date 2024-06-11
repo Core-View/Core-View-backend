@@ -78,38 +78,21 @@ class UserService {
   async modifyUserImage(user_id, imageFileName) {
     try {
       const connection = await pool.getConnection();
-  
-      // 이전 이미지 경로 가져오기
-      const [previousImageRows] = await connection.query(
-        "SELECT user_image FROM user WHERE user_id = ?", 
-        [user_id]
-      );
 
-      const previous_image_path = previousImageRows[0].user_image;
-
-      // 기존 이미지가 존재하면 삭제
-      if (previous_image_path) {
-        // 이미지 파일 경로 생성
-        const previousImagePath = path.join(__dirname, '../../uploads/', previous_image_path);
-
-        // 파일 삭제
-        await fs.promises.unlink(previousImagePath);
-      }
-  
       const [result] = await connection.query(
         "UPDATE user SET user_image = ? WHERE user_id = ?", 
         [imageFileName, user_id]
       );
-  
+
       console.log("사용자 이미지 수정 완료:", result);
-  
+
       connection.release();
-  
+
       if (result.affectedRows === 0) {
         throw new Error("사용자를 찾을 수 없음");
       }
-  
-      return { message: "사용자 이미지가 성공적으로 수정되었습니다.", previous_image_path };
+
+      return { message: "사용자 이미지가 성공적으로 수정되었습니다.", previous_image_path: imageFileName };
     } catch (error) {
       console.error("사용자 이미지 수정 중 에러 발생:", error);
       throw error;
