@@ -21,4 +21,7 @@ router.post("/post", noticeController.noticePost);
 // router.post("image", upload.single('image'), (req, res) => {
 //     res.status(200).json(req.file); //파일 경로 전송
 // })
+
+router.get("/viewuser", noticeController.noticeUser);
+
 module.exports = router;

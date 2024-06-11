@@ -69,4 +69,17 @@ const postNotice = async (req, res) => {
         res.status(500).send({success: false, message: "잠시후 다시 시도해주세요"});
     }
 }
-module.exports = {getNotice, getDetail, deleteNotice, updateNotice, postNotice}
+
+const getUser = async (req, res) => {
+    let sql = `SELECT USER_ID, USER_NAME, USER_NICKNAME, USER_EMAIL, USER_CONTRIBUTE FROM USER`;
+
+    try{
+        const [result] = await pool.query(sql);
+        res.status(200).send({success: true, user: result});
+    }catch(error) {
+        console.log(error);
+        res.status(500).send({success: false, message: "잠시후 다시 시도해주세요"});
+    }
+}
+
+module.exports = {getNotice, getDetail, deleteNotice, updateNotice, postNotice, getUser}
