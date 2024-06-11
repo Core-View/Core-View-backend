@@ -27,8 +27,7 @@ class UserController {
     }
 
     try {
-      // Modify user info without image
-      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
+      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null); // Pass null for image data
       res.json(updatedUserInfo);
     } catch (error) {
       console.error("사용자 정보 수정 중 에러 발생:", error);
@@ -41,28 +40,33 @@ class UserController {
 
   async modifyUserImage(req, res) {
     const user_id = req.params.user_id;
-    
+
     try {
       let imageFileName = null;
+      let previousImagePath = null;
+
       if (req.file && req.file.buffer) {
         const user_image_data = req.file.buffer.toString('base64');
         const fileName = `${user_id}_${Date.now()}.png`;
         const filePath = path.join(__dirname, '../../uploads/', fileName);
-  
-        // 이미지를 파일로 저장
+
+        // 기존 이미지 경로 가져오기
+        const userInfo = await userService.getUserInfoByUserId(user_id);
+        previousImagePath = userInfo.profile_picture ? path.join(__dirname, '../../uploads/', userInfo.profile_picture) : null;
+
+        // 기존 이미지 삭제
+        if (previousImagePath) {
+          await fs.promises.unlink(previousImagePath);
+        }
+
+        // 새 이미지를 파일로 저장
         await fs.promises.writeFile(filePath, user_image_data, 'base64');
-  
+
         imageFileName = fileName;
       }
-  
+
       const updatedUserImage = await userService.modifyUserImage(user_id, imageFileName);
-      
-      // 이미지 업로드 후, 기존 이미지 삭제 (옵션)
-      if (updatedUserImage.previous_image_path) {
-        const previousImagePath = path.join(__dirname, '../../uploads/', updatedUserImage.previous_image_path);
-        await fs.promises.unlink(previousImagePath);
-      }
-  
+
       res.json(updatedUserImage);
     } catch (error) {
       console.error("사용자 이미지 수정 중 에러 발생:", error);
@@ -72,6 +76,7 @@ class UserController {
       res.status(500).json({ message: "사용자 이미지 수정 중 에러 발생" });
     }
   }
+  
 
   async deleteUser(req, res) {
     const user_id = req.params.user_id;
