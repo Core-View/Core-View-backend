@@ -10,11 +10,11 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     // 로그인 성공 시 리다이렉트할 경로 설정
-    res.redirect('/profile');
+    res.redirect('/mypage');
   });
 
 // 로그아웃 라우터
-router.get('/logout', (req, res) => {
+router.get('/logout', (req, res, next) => {
   req.logout((err) => {
     if (err) {
       return next(err);
