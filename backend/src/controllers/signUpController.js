@@ -4,9 +4,9 @@ const mailer = require("./mailer");
 let code;
 
 const signUp = async (req, res) => {
-  const { username, nickname, email, password } = req.body;
+  const { user_name,user_nickname, user_email, user_password } = req.body;
   try {
-    const result = await signUpService.signUp(username, nickname, email, password);
+    const result = await signUpService.signUp(user_name,user_nickname, user_email, user_password);
     if (result.success) {
       res.status(200).json({
         message: "회원가입이 성공적으로 완료되었습니다.",
