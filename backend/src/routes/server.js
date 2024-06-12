@@ -18,6 +18,8 @@ const top3FeedbackRouter = require("./top3FeedbackRouter");
 const resetPasswordRouter = require("./resetPasswordRouter"); // 새로운 라우터 추가
 const passwordRouter = require('./passwordRouter');
 
+const feedbackRouter = require('./feedbackRouter')
+
 // Passport 설정 파일
 require('../../config/passport-setup');
 
@@ -68,9 +70,19 @@ app.use('/password', passwordRouter);
 
 console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
 
+// 피드백 관련 라우트 사용 (인증 우회)
+app.use('/api', feedbackRouter);
+
+// 에러 핸들링 미들웨어 추가
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Internal Server Error' });
+});
+
 app.listen(3000, () => {
   console.log('Server is running on port 3000');});
 
 
 
 // 기타 필요한 라우터 등록
+//const { sessionMiddleware, authenticateSession } = require('../middleware/authmiddleware'); // 경로 수정

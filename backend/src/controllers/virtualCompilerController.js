@@ -1,4 +1,4 @@
-const { pool } = require('../../config/databaseSet');
+const pool = require('../../config/databaseSet');
 const { runCCode, runCppCode, runJavaCode, runPythonCode } = require('../services/virtualCompilerService');
 
 async function compileCode(req, res) {
