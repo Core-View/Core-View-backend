@@ -1,48 +1,45 @@
-// src/controllers/postController.js
-
-const db = require('../../config/databaseSet');
 const pool = require('../../config/databaseSet');
 
-// 포스트 제목으로 검색하는 함수
-const searchPostsByTitle = async (req, res) => {
-  const { post_title } = req.get("post_title")
-  const sqlQuery = `
-    SELECT * 
-    FROM post 
-    WHERE post_title LIKE '%?%'
-  `;
-
-  console.log(post_title)
-
-  try {
-    console.log('Executing query:', sqlQuery);
-    const [results] = await pool.query(sqlQuery, [post_title]);
-    res.json(results);
-  } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
-  }
-};
-
 // 좋아요를 받는 함수
-const likePost = async (req, res) => {
-  const { post_id, user_id } = req.body; // 사용자의 ID를 요청 바디에서 받아옴
+exports.likePost = async (req, res) => {
+  const { post_id, user_id } = req.body; // 요청 본문에서 post_id와 user_id 가져오기
+
+  if (!post_id || !user_id) {
+    return res.status(400).json({ error: 'post_id 또는 user_id 파라미터가 없습니다.' });
+  }
+
   const sqlQuery = `
-    INSERT INTO post_likes (post_id, user_id) VALUES (${post_id}, ${user_id}) 
+    INSERT INTO post_likes (post_id, user_id, post_likes_date) VALUES (?, ?, NOW()) 
   `;
 
   try {
-    console.log('Executing query:', sqlQuery);
-    await pool.query(sqlQuery);
-    res.status(201).json({ message: 'Post liked successfully' });
+    console.log('쿼리 실행 중:', sqlQuery);
+    await pool.query(sqlQuery, [post_id, user_id]);
+    res.status(201).json({ message: '포스트가 성공적으로 좋아요 되었습니다.' });
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
+
+//제목으로 포스트를 검색하는 함수
+exports.searchPostsByTitle = async (req, res) => {
+  const { post_title } = req.query;
+  try {
+      const [rows, fields] = await pool.query(
+          `SELECT * FROM post WHERE post_title LIKE ?`,
+          [`%${post_title}%`]
+      );
+      res.json({ success: true, data: rows });
+  } catch (error) {
+      console.error("검색 오류:", error);
+      res.status(500).json({ success: false, message: "검색 중 오류가 발생했습니다." });
+  }
+};
+
 
 // 최신 순으로 포스트를 정렬하는 함수
-const getPostsByDate = async (req, res) => {
+exports.getPostsByDate = async (req, res) => {
   const sqlQuery = `
     SELECT * 
     FROM post 
@@ -50,17 +47,17 @@ const getPostsByDate = async (req, res) => {
   `;
 
   try {
-    console.log('Executing query:', sqlQuery);
+    console.log('쿼리 실행 중:', sqlQuery);
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
 
 // 좋아요가 많은 순으로 포스트를 정렬하는 함수
-const getPostsByLikes = async (req, res) => {
+exports.getPostsByLikes = async (req, res) => {
   const sqlQuery = `
     SELECT p.*, COUNT(pl.post_id) AS total_likes 
     FROM post p 
@@ -70,17 +67,17 @@ const getPostsByLikes = async (req, res) => {
   `;
 
   try {
-    console.log('Executing query:', sqlQuery);
+    console.log('쿼리 실행 중:', sqlQuery);
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
 
 // 최근 게시물 중에서 최신 3개를 가져오는 함수
-const getRecent3Posts = async (req, res) => {
+exports.getRecent3Posts = async (req, res) => {
   const sqlQuery = `
     SELECT * 
     FROM post 
@@ -89,18 +86,18 @@ const getRecent3Posts = async (req, res) => {
   `;
 
   try {
-    console.log('Executing query:', sqlQuery);
+    console.log('쿼리 실행 중:', sqlQuery);
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
 
 // 사용자 기여도를 가져오는 함수
-const getUserContribution = async (req, res) => {
-  const { user_id } = req.body;
+exports.getUserContribution = async (req, res) => {
+  const { user_id } = req.body; // 요청 본문에서 user_id 가져오기
 
   const sqlQuery = `
     SELECT 
@@ -116,17 +113,17 @@ const getUserContribution = async (req, res) => {
   `;
 
   try {
-    console.log('Executing query:', sqlQuery);
+    console.log('쿼리 실행 중:', sqlQuery);
     const [results] = await pool.query(sqlQuery, [user_id]);
     res.json(results);
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
 
 // 기여도가 높은 상위 3명의 사용자를 가져오는 함수
-const getTop3Contributors = async (req, res) => {
+exports.getTop3Contributors = async (req, res) => {
   const sqlQuery = `
     SELECT 
       u.user_id, 
@@ -142,13 +139,11 @@ const getTop3Contributors = async (req, res) => {
   `;
 
   try {
-    console.log('Executing query:', sqlQuery);
+    console.log('쿼리 실행 중:', sqlQuery);
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ error: 'Database error' });
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
-
-module.exports = {searchPostsByTitle, likePost, getPostsByDate, getPostsByLikes, getRecent3Posts, getUserContribution, getTop3Contributors}
