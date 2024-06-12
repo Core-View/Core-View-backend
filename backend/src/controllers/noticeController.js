@@ -29,4 +29,8 @@ const noticePost = (req, res) => {
     noticeService.postNotice(req, res);
 }
 
-module.exports = {noticeView, noticeDetail, noticeDelete, noticeModify, noticePost}
+const noticeUser = (req, res) => {
+    noticeService.getUser(req, res);
+}
+
+module.exports = {noticeView, noticeDetail, noticeDelete, noticeModify, noticePost, noticeUser}
