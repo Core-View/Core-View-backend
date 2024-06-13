@@ -104,10 +104,12 @@ exports.getUserContribution = async (req, res) => {
       u.user_id, 
       IFNULL(SUM(pl.post_id IS NOT NULL), 0) AS post_likes, 
       IFNULL(SUM(fl.feedback_id IS NOT NULL), 0) AS feedback_likes, 
-      (IFNULL(SUM(pl.post_id IS NOT NULL), 0) + IFNULL(SUM(fl.feedback_id IS NOT NULL), 0)) AS total_contribution 
+      IFNULL(COUNT(fb.feedback_id), 0) AS feedback_count,
+      (IFNULL(SUM(pl.post_id IS NOT NULL), 0) + IFNULL(SUM(fl.feedback_id IS NOT NULL), 0) + IFNULL(COUNT(fb.feedback_id), 0)) AS total_contribution 
     FROM user u 
     LEFT JOIN post_likes pl ON u.user_id = pl.user_id 
     LEFT JOIN feedback_likes fl ON u.user_id = fl.user_id 
+    LEFT JOIN feedback fb ON u.user_id = fb.user_id
     WHERE u.user_id = ? 
     GROUP BY u.user_id
   `;
@@ -129,10 +131,12 @@ exports.getTop3Contributors = async (req, res) => {
       u.user_id, 
       IFNULL(SUM(pl.post_id IS NOT NULL), 0) AS post_likes, 
       IFNULL(SUM(fl.feedback_id IS NOT NULL), 0) AS feedback_likes, 
-      (IFNULL(SUM(pl.post_id IS NOT NULL), 0) + IFNULL(SUM(fl.feedback_id IS NOT NULL), 0)) AS total_contribution 
+      IFNULL(COUNT(fb.feedback_id), 0) AS feedback_count,
+      (IFNULL(SUM(pl.post_id IS NOT NULL), 0) + IFNULL(SUM(fl.feedback_id IS NOT NULL), 0) + IFNULL(COUNT(fb.feedback_id), 0)) AS total_contribution 
     FROM user u 
     LEFT JOIN post_likes pl ON u.user_id = pl.user_id 
     LEFT JOIN feedback_likes fl ON u.user_id = fl.user_id 
+    LEFT JOIN feedback fb ON u.user_id = fb.user_id
     GROUP BY u.user_id
     ORDER BY total_contribution DESC
     LIMIT 3
@@ -147,3 +151,5 @@ exports.getTop3Contributors = async (req, res) => {
     res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
+
+
