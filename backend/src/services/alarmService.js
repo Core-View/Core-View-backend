@@ -18,4 +18,24 @@ const getAlarm = async (user_id) => {
     }
 }
 
-module.exports = {getAlarm};
+const postAlarm = async (post_id, feedback_id) => {
+
+    //알람을 받을 사람
+    let sql = `SELECT USER_ID FROM POST WHERE POST_ID = ?`;
+
+    try{
+        let [result] = await pool.query(sql, [post_id]);
+
+        console.log(result[0].USER_ID);
+        let user_id = result[0].USER_ID;
+        sql = `INSERT INTO ALARM (ALARM_DATE, FEEDBACK_ID, USER_ID, ALARM_CHECK) VALUES (now(),?,?,0)`;
+
+        let [inser_result] = await pool.query(sql, [feedback_id,user_id]);
+
+        
+    }catch(error){
+        console.log(error);
+    }
+}
+
+module.exports = {getAlarm,postAlarm};

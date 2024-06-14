@@ -1,7 +1,6 @@
 const signUpService = require("../services/signUpService");
 const loginService = require("../services/loginService");
 const mailer = require("./mailer");
-let code;
 
 const signUp = async (req, res) => {
   const { user_name,user_nickname, user_email, user_password } = req.body;
@@ -23,7 +22,7 @@ const signUp = async (req, res) => {
 
 const auth = async (req, res) => {
   const email = req.body.email;
-  code = signUpService.create_code();
+  code = await signUpService.create_code();
 
   try {
     await mailer.sendMail(
@@ -31,7 +30,10 @@ const auth = async (req, res) => {
       "<Core-view> 이메일 인증코드입니다",
       `<p>이메일 인증코드입니다. ${code}를 입력해주세요</p>`
     );
-    res.status(200).send({ success: true, code: code });
+
+    req.session[email] = code;
+
+    res.status(200).send({ success: true});
   } catch (error) {
     console.error("Error in auth controller:", error);
     res.status(500).json({ message: "서버 에러가 발생했습니다." });
@@ -40,10 +42,12 @@ const auth = async (req, res) => {
 
 const emailCheck = (req, res) => {
   let user_code = req.body.authcode;
-  console.log(code);
-  if (parseInt(user_code) !== parseInt(code)) {
+  let email = req.body.email;
+
+  if (req.session[email] != user_code) {
     res.status(200).send({ success: false, message: user_code });
   } else {
+    delete req.session.user_email;
     res.status(200).send({ success: true, message: "인증번호가 일치합니다." });
   }
 };

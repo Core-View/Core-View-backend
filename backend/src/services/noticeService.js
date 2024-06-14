@@ -82,4 +82,17 @@ const getUser = async (req, res) => {
     }
 }
 
-module.exports = {getNotice, getDetail, deleteNotice, updateNotice, postNotice, getUser}
+const getNoticeToPost = async (req, res) => {
+
+    let sql = `SELECT NOTICE_ID, NOTICE_TITLE, NOTICE_DATE FROM NOTICE ORDER BY NOTICE_DATE LIMIT 3`;
+
+    try{
+        let [result] = await pool.query(sql);
+
+        res.status(200).send({success: true, notice: result});
+    }catch(error) {
+        console.log(error);
+        res.status(500).send({success: false, message: "잠시후 다시 시도해주세요"});
+    }
+}
+module.exports = {getNotice, getDetail, deleteNotice, updateNotice, postNotice, getUser,getNoticeToPost}

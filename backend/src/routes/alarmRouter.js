@@ -7,7 +7,4 @@ router.get('/start', (req, res) => controller.subscribe(req, res));
 
 router.get('/stop', (req,res) => controller.unsubscribe(res));
 
-//임시로 피드백이 달렸다 가정
-router.post('/post', (req, res) => controller.fileWrite(Math.random()));
-
 module.exports = router;

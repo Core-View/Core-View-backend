@@ -37,4 +37,9 @@ const signUp = async (user_name, user_nickname, user_email, user_password) => {
   }
 };
 
-module.exports = { signUp };
+const create_code = async() => {
+  let n = Math.floor(Math.random() * 1000000);
+  return n.toString().padStart(6, "0");
+};
+
+module.exports = { signUp,create_code };
