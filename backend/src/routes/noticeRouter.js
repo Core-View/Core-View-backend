@@ -24,4 +24,6 @@ router.post("/post", noticeController.noticePost);
 
 router.get("/viewuser", noticeController.noticeUser);
 
+router.get("/image", noticeController.upload, noticeController.noticeImage);
+
 module.exports = router;
