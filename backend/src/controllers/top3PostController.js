@@ -1,5 +1,4 @@
 // src/controllers/postController.js
-const db = require('../../config/databaseSet');
 const pool = require('../../config/databaseSet');
 
 // 최근 2주간의 게시물 중에서 좋아요가 많은 상위 3개를 가져오는 함수
@@ -12,7 +11,7 @@ exports.getTop3Posts = async (req, res) => {
     SELECT p.*, COUNT(pl.post_id) AS total_likes 
     FROM post p
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
-    WHERE p.post_date >= '${twoWeeksAgoFormatted}'
+    WHERE p.post_date >= ?
     GROUP BY p.post_id 
     ORDER BY total_likes DESC
     LIMIT 3
@@ -20,7 +19,7 @@ exports.getTop3Posts = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await pool.query(sqlQuery);
+    const [results] = await pool.query(sqlQuery, [twoWeeksAgoFormatted]);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);
@@ -40,7 +39,7 @@ exports.getTop3Feedback = async (req, res) => {
     SELECT f.*, COUNT(fl.feedback_id) AS total_likes 
     FROM feedback f
     LEFT JOIN feedback_likes fl ON f.feedback_id = fl.feedback_id
-    WHERE f.feedback_date >= '${twoWeeksAgoFormatted}'
+    WHERE f.feedback_date >= ?
     GROUP BY f.feedback_id 
     ORDER BY total_likes DESC
     LIMIT 3
@@ -48,7 +47,7 @@ exports.getTop3Feedback = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await pool.query(sqlQuery);
+    const [results] = await pool.query(sqlQuery, [twoWeeksAgoFormatted]);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);

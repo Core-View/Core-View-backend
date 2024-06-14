@@ -28,12 +28,13 @@ require('../../config/passport-setup');
 
 const app = express();
 
+
 // CORS 설정
 app.use(cors());
 
 // JSON 파싱을 위한 미들웨어
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // 세션 설정
 app.use(session({
   secret: process.env.SESSION_SECRET,

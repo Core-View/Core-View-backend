@@ -14,7 +14,7 @@ const signUp = async (req, res) => {
       });
     } else {
       res.status(400).json({ message: result.error });
-    }
+    } 
   } catch (error) {
     console.error("Error in signUp controller:", error);
     res.status(500).json({ message: "서버 에러가 발생했습니다." });
