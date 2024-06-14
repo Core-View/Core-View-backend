@@ -6,6 +6,7 @@ const postController = require('../controllers/postController');
 
 router.get('/search', postController.searchPostsByTitle);
 router.post('/like', postController.likePost); // 포스트 좋아요
+router.delete('/unlike', postController.unlikePost); // 포스트 좋아요 취소
 router.get('/latest', postController.getPostsByDate); // 최신 순으로 포스트 가져오기
 router.get('/mostlike', postController.getPostsByLikes); // 좋아요가 많은 순으로 포스트 가져오기
 router.get('/recent', postController.getRecent3Posts); // 최근 게시물 중에서 최신 3개 가져오기
