@@ -1,19 +1,22 @@
 // src/controllers/postController.js
 
 const db = require('../../config/databaseSet');
+const pool = require('../../config/databaseSet');
 
 // 포스트 제목으로 검색하는 함수
-exports.searchPostsByTitle = async (req, res) => {
-  const { post_title } = req.query;
+const searchPostsByTitle = async (req, res) => {
+  const { post_title } = req.get("post_title")
   const sqlQuery = `
     SELECT * 
     FROM post 
-    WHERE post_title LIKE '%${post_title}%'
+    WHERE post_title LIKE '%?%'
   `;
+
+  console.log(post_title)
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await db.pool.query(sqlQuery);
+    const [results] = await pool.query(sqlQuery, [post_title]);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);
@@ -22,7 +25,7 @@ exports.searchPostsByTitle = async (req, res) => {
 };
 
 // 좋아요를 받는 함수
-exports.likePost = async (req, res) => {
+const likePost = async (req, res) => {
   const { post_id, user_id } = req.body; // 사용자의 ID를 요청 바디에서 받아옴
   const sqlQuery = `
     INSERT INTO post_likes (post_id, user_id) VALUES (${post_id}, ${user_id}) 
@@ -30,7 +33,7 @@ exports.likePost = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    await db.pool.query(sqlQuery);
+    await pool.query(sqlQuery);
     res.status(201).json({ message: 'Post liked successfully' });
   } catch (err) {
     console.error('Database error:', err);
@@ -39,7 +42,7 @@ exports.likePost = async (req, res) => {
 };
 
 // 최신 순으로 포스트를 정렬하는 함수
-exports.getPostsByDate = async (req, res) => {
+const getPostsByDate = async (req, res) => {
   const sqlQuery = `
     SELECT * 
     FROM post 
@@ -48,7 +51,7 @@ exports.getPostsByDate = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await db.pool.query(sqlQuery);
+    const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);
@@ -57,7 +60,7 @@ exports.getPostsByDate = async (req, res) => {
 };
 
 // 좋아요가 많은 순으로 포스트를 정렬하는 함수
-exports.getPostsByLikes = async (req, res) => {
+const getPostsByLikes = async (req, res) => {
   const sqlQuery = `
     SELECT p.*, COUNT(pl.post_id) AS total_likes 
     FROM post p 
@@ -68,7 +71,7 @@ exports.getPostsByLikes = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await db.pool.query(sqlQuery);
+    const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);
@@ -77,7 +80,7 @@ exports.getPostsByLikes = async (req, res) => {
 };
 
 // 최근 게시물 중에서 최신 3개를 가져오는 함수
-exports.getRecent3Posts = async (req, res) => {
+const getRecent3Posts = async (req, res) => {
   const sqlQuery = `
     SELECT * 
     FROM post 
@@ -87,7 +90,7 @@ exports.getRecent3Posts = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await db.pool.query(sqlQuery);
+    const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);
@@ -96,7 +99,7 @@ exports.getRecent3Posts = async (req, res) => {
 };
 
 // 사용자 기여도를 가져오는 함수
-exports.getUserContribution = async (req, res) => {
+const getUserContribution = async (req, res) => {
   const { user_id } = req.body;
 
   const sqlQuery = `
@@ -114,7 +117,7 @@ exports.getUserContribution = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await db.pool.query(sqlQuery, [user_id]);
+    const [results] = await pool.query(sqlQuery, [user_id]);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);
@@ -123,7 +126,7 @@ exports.getUserContribution = async (req, res) => {
 };
 
 // 기여도가 높은 상위 3명의 사용자를 가져오는 함수
-exports.getTop3Contributors = async (req, res) => {
+const getTop3Contributors = async (req, res) => {
   const sqlQuery = `
     SELECT 
       u.user_id, 
@@ -140,10 +143,12 @@ exports.getTop3Contributors = async (req, res) => {
 
   try {
     console.log('Executing query:', sqlQuery);
-    const [results] = await db.pool.query(sqlQuery);
+    const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
     console.error('Database error:', err);
     res.status(500).json({ error: 'Database error' });
   }
 };
+
+module.exports = {searchPostsByTitle, likePost, getPostsByDate, getPostsByLikes, getRecent3Posts, getUserContribution, getTop3Contributors}

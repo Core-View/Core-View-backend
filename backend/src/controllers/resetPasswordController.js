@@ -1,6 +1,6 @@
 // controllers/resetPasswordController.js
 
-const { pool } = require('../../config/databaseSet');
+const pool = require('../../config/databaseSet');
 const { sendMail } = require('./mailer');
 const { hashPassword } = require('../utils/cryptoUtils');
 const crypto = require("crypto");
