@@ -39,6 +39,20 @@ exports.getFeedbackById = async (req, res) => {
     }
 };
 
+// post_id로 특정 피드백 조회
+exports.getFeedbacksByPostId = async (req, res) => {
+    try {
+        const feedbacks = await feedbackService.getFeedbacksByPostId(req.params.post_id);
+        if (!feedbacks || feedbacks.length === 0) {
+            return handleResponse(res, 404, { error: 'Feedbacks not found for the given post_id' });
+        }
+        handleResponse(res, 200, feedbacks);
+    } catch (error) {
+        console.error('Error in getFeedbacksByPostId:', error);
+        handleResponse(res, 500, null, error);
+    }
+};
+
 // 피드백 수정
 exports.updateFeedback = async (req, res) => {
     try {
