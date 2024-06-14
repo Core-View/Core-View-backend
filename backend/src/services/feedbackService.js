@@ -4,7 +4,7 @@ const { formatDateToISOString } = require('../utils/dateUtil');
 // 새로운 피드백 생성
 exports.createFeedback = async (data) => {
   const { post_id, user_id, feedback_comment, feedback_codenumber } = data;
-  const feedback_date = formatDateToISOString(new Date()); // 현재 시간을 가져와서 ISO 형식 문자열로 변환합니다.
+  const feedback_date = formatDateToISOString(new Date());
   const query = `
     INSERT INTO feedback (post_id, user_id, feedback_date, feedback_comment, feedback_codenumber)
     VALUES (?, ?, ?, ?, ?)
@@ -38,6 +38,18 @@ exports.getFeedbackById = async (id) => {
     return rows[0];
   } catch (error) {
     console.error('Error in getFeedbackById:', error);
+    throw error;
+  }
+};
+
+// post_id로 특정 피드백 조회
+exports.getFeedbacksByPostId = async (post_id) => {
+  const query = `SELECT * FROM feedback WHERE post_id = ?`;
+  try {
+    const [rows] = await pool.query(query, [post_id]);
+    return rows;
+  } catch (error) {
+    console.error('Error in getFeedbacksByPostId:', error);
     throw error;
   }
 };
