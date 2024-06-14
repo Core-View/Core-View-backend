@@ -1,5 +1,6 @@
 const userService = require('../services/mypageService');
-const { hashPassword } = require("../utils/cryptoUtils");
+const { hashedPassword } = require("../utils/cryptoUtils");
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
@@ -30,12 +31,10 @@ class UserController {
     }
   
     try {
-      // 비밀번호 해싱
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(user_password, salt);
+     
   
       // Modify user info without image
-      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, hashedPassword, user_intro, null);
+      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
       return res.json(updatedUserInfo);
     } catch (error) {
       console.error("사용자 정보 수정 중 에러 발생:", error);

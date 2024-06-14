@@ -1,4 +1,5 @@
-const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const { hashPassword } = require('../utils/cryptoUtils');
 const pool = require('../../config/databaseSet');
 const fs = require('fs').promises;
 const path = require('path');
@@ -39,13 +40,15 @@ class UserService {
         const connection = await pool.getConnection();
 
         // 사용자 비밀번호를 bcrypt를 사용하여 해싱
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(user_password, salt);
+        const user_salt = crypto.randomBytes(32).toString('hex');
+
+        // 비밀번호 해싱
+        const hashedPassword = hashPassword(user_password, user_salt);
 
         // 비밀번호와 솔트 업데이트를 포함한 사용자 정보 업데이트 쿼리
         const [result] = await connection.query(
             "UPDATE user SET user_nickname = ?, user_password = ?, user_intro = ?, user_salt = ? WHERE user_id = ?", 
-            [user_nickname, hashedPassword, user_intro, salt, user_id]
+            [user_nickname, hashedPassword, user_intro, user_salt, user_id]
         );
 
         console.log("사용자 정보 수정 완료:", result);

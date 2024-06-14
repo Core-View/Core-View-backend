@@ -1,15 +1,6 @@
 const bcrypt = require('bcrypt');
-const { hashPassword } = require('../utils/cryptoUtils');
+const { comparePassword } = require('../utils/cryptoUtils');
 const pool = require('../../config/databaseSet');
-
-const comparePassword = async (inputPassword, hashedPassword) => {
-  try {
-    return await bcrypt.compare(inputPassword, hashedPassword);
-  } catch (error) {
-    console.error("비밀번호 비교 중 에러 발생:", error);
-    throw error;
-  }
-};
 
 // 로그인 인증 함수
 const authenticate = async (user_email, inputPassword) => {
@@ -22,7 +13,8 @@ const authenticate = async (user_email, inputPassword) => {
     }
 
     const user = rows[0];
-    console.log("데이터베이스에서 찾은 사용자:", user);
+
+
 
     // 저장된 해시된 비밀번호와 입력된 비밀번호 비교
     const isMatch = await comparePassword(inputPassword, user.user_password, user.user_salt);
@@ -48,4 +40,4 @@ const authenticate = async (user_email, inputPassword) => {
   }
 };
 
-module.exports = { authenticate, comparePassword };
+module.exports = { authenticate };
