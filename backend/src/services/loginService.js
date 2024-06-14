@@ -25,7 +25,7 @@ const authenticate = async (user_email, inputPassword) => {
     console.log("데이터베이스에서 찾은 사용자:", user);
 
     // 저장된 해시된 비밀번호와 입력된 비밀번호 비교
-    const isMatch = comparePassword(inputPassword, user.user_password, user.user_salt);
+    const isMatch = await comparePassword(inputPassword, user.user_password, user.user_salt);
 
     if (!isMatch) {
       console.log("비밀번호가 일치하지 않음");
