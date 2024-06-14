@@ -18,7 +18,7 @@ const passwordRouter = require('./passwordRouter');
 const feedbackRouter = require('./feedbackRouter');
 const noticeRouter = require("./noticeRouter");
 const alarmRouter = require('./alarmRouter');
-const homeRouter = require('./homeRouter'); // 홈 페이지 라우터 추가(소셜계정 테스트용, 삭제 하셔도 됩니다)
+// const homeRouter = require('./homeRouter'); // 홈 페이지 라우터 추가(소셜계정 테스트용, 삭제 하셔도 됩니다)
 
 // 환경 변수 설정
 dotenv.config({ path: './src/routes/.env' });
@@ -37,7 +37,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // 세션 설정
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET_KEY,
   resave: false,
   saveUninitialized: true
 }));
@@ -60,7 +60,7 @@ app.use("/", resetPasswordRouter);
 app.use('/notice', noticeRouter);
 app.use('/sse/streaming', alarmRouter);
 app.use('/password', passwordRouter);
-app.use('/', homeRouter); // 홈 페이지 라우터 사용(구글 소셜로그인 테스트용 삭제 해주셔도 됩니다)
+// app.use('/', homeRouter); // 홈 페이지 라우터 사용(구글 소셜로그인 테스트용 삭제 해주셔도 됩니다)
 
 console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
 

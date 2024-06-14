@@ -1,4 +1,5 @@
 const pool = require('../../config/databaseSet');
+const noticeService = require('../services/noticeService');
 
 // 좋아요를 받는 함수
 exports.likePost = async (req, res) => {
@@ -174,5 +175,10 @@ exports.getTop3Contributors = async (req, res) => {
     res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
+
+exports.getNotice = (req, res) => {
+  noticeService.getNoticeToPost(req, res);
+}
+
 
 
