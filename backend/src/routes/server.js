@@ -23,24 +23,25 @@ const feedbackRouter = require('./feedbackRouter')
 // Passport 설정 파일
 require('../../config/passport-setup');
 
-dotenv.config({ path: './src/routes/.env' });
+dotenv.config({ path: '../src/routes/.env' });
 
 
 const noticeRouter = require("./noticeRouter");
 const alarmRouter = require('./alarmRouter');
 require('../../config/passport-setup'); // 경로 수정
 
-require('dotenv').config({ path: './src/routes/.env' });
+require('dotenv').config({ path: '../src/routes/.env' });
 
 dotenv.config();
 const app = express();
+
 
 // CORS 설정
 app.use(cors());
 
 // JSON 파싱을 위한 미들웨어
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // 세션 설정
 app.use(session({
   secret: 'your-secret-key',

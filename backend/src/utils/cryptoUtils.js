@@ -5,7 +5,9 @@ const hashPassword = (password, salt) => {
 };
 
 const comparePassword = (inputPassword, storedPassword, salt) => {
+  
   const hashedInputPassword = hashPassword(inputPassword, salt);
+  console.log(hashedInputPassword);
   return hashedInputPassword === storedPassword;
 };
 
