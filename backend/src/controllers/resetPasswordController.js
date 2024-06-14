@@ -50,13 +50,13 @@ const emailCheck = (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-    const { user_email, new_password } = req.body;
+    const { user_email, user_password } = req.body;
 
     try {
-        const salt = crypto.randomBytes(16).toString("hex");
-        const hashedPassword = hashPassword(new_password, salt);
+        const user_salt = crypto.randomBytes(16).toString("hex");
+        const hashedPassword = hashPassword(user_password, user_salt);
 
-        await pool.query('UPDATE user SET user_password = ?, salt = ? WHERE user_email = ?', [hashedPassword, salt, user_email]);
+        await pool.query('UPDATE user SET user_password = ?, user_salt = ? WHERE user_email = ?', [hashedPassword, user_salt, user_email]);
 
         resetCode = null; // 인증 코드 초기화
 
