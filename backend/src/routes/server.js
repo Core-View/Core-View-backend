@@ -4,26 +4,27 @@ const dotenv = require("dotenv");
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const session = require('express-session');
-const authRouter = require('./authRouter'); 
-const profileRouter = require('./profileRouter');
-const virtualCompilerRouter = require('./virtualCompilerRouter');
 const signUpRouter = require("./signUpRouter");
 const loginRouter = require("./loginRouter");
+const logoutRouter = require("./logoutRouter");
+const profileRouter = require('./profileRouter');
+const virtualCompilerRouter = require('./virtualCompilerRouter');
 const mypageRouter = require("./mypageRouter");
 const postRouter = require("./postRouter");
 const top3PostsRouter = require("./top3PostsRouter");
 const top3FeedbackRouter = require("./top3FeedbackRouter");
-const resetPasswordRouter = require("./resetPasswordRouter"); // 새로운 라우터 추가
+const resetPasswordRouter = require("./resetPasswordRouter");
 const passwordRouter = require('./passwordRouter');
-const feedbackRouter = require('./feedbackRouter'); // 피드백 라우터 추가
+const feedbackRouter = require('./feedbackRouter');
 const noticeRouter = require("./noticeRouter");
 const alarmRouter = require('./alarmRouter');
+const homeRouter = require('./homeRouter'); // 홈 페이지 라우터 추가(소셜계정 테스트용, 삭제 하셔도 됩니다)
 
-// Passport 설정 파일
-require('../../config/passport-setup');
-
+// 환경 변수 설정
 dotenv.config({ path: './src/routes/.env' });
-dotenv.config();
+
+// Passport 설정 파일 로드
+require('../../config/passport-setup');
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use(express.json());
 
 // 세션 설정
 app.use(session({
-  secret: 'your-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true
 }));
@@ -46,28 +47,28 @@ app.use(passport.session());
 
 app.use("/sign", signUpRouter);
 app.use("/login", loginRouter);
+app.use("/logout", logoutRouter);
 app.use('/api', virtualCompilerRouter);
 app.use("/mypage", mypageRouter);
-app.use('/auth', authRouter);
 app.use('/', profileRouter);
 
 app.use("/post", postRouter); 
 app.use("/", top3PostsRouter); 
 app.use("/", top3FeedbackRouter);
-app.use("/", resetPasswordRouter); // 비밀번호 재설정 라우터 추가
-app.use('/notice', noticeRouter); //공지 관련 라우터
-app.use('/sse/streaming',alarmRouter ); //알림
-app.use('/password', passwordRouter); 
+app.use("/", resetPasswordRouter);
+app.use('/notice', noticeRouter);
+app.use('/sse/streaming', alarmRouter);
+app.use('/password', passwordRouter);
+app.use('/', homeRouter); // 홈 페이지 라우터 사용(구글 소셜로그인 테스트용 삭제 해주셔도 됩니다)
 
 console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
 
-// 피드백 관련 라우트 사용 (인증 우회)
 app.use('/api', feedbackRouter);
 
 // 에러 핸들링 미들웨어 추가
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Internal Server Error' });
+  res.status(500).json({ message: 'Internal Server Error', error: err.message });
 });
 
 app.listen(3000, () => {

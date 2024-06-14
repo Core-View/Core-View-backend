@@ -1,11 +1,12 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const pool = require('./databaseSet');
+require('dotenv').config();
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/callback"
+  callbackURL: "http://localhost:3000/sign/google/callback"
 },
 async function(token, tokenSecret, profile, done) {
   try {
@@ -42,5 +43,3 @@ passport.deserializeUser(async (id, done) => {
     done(err, null);
   }
 });
-
-module.exports = passport;
