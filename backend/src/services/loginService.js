@@ -30,8 +30,6 @@ const authenticate = async (user_email, inputPassword) => {
     return {
       success: true,
       user_id: user.user_id,
-      user_email: user.user_email,
-      user_nickname: user.user_nickname,
       // 필요한 경우 추가 정보 반환
     };
   } catch (err) {
