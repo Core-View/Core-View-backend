@@ -3,10 +3,12 @@ const { runCCode, runCppCode, runJavaCode, runPythonCode } = require('../service
 
 async function compileCode(req, res) {
     const { title, language, code, content, user_id } = req.body;
+    let postId = null; // postId를 초기화합니다.
 
     try {
         let output;
         let result;
+
         switch (language) {
             case 'c':
                 result = await runCCode(code);
@@ -30,25 +32,37 @@ async function compileCode(req, res) {
 
         // MySQL에 데이터 삽입
         const connection = await pool.getConnection();
-        const [results, fields] = await connection.execute(
+        const [insertResults, fields] = await connection.execute(
             'INSERT INTO coreview.post (post_title, post_code, post_result, post_content, post_date, user_id, language) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
             [title, code, result, content, user_id, language]
         );
+        postId = insertResults.insertId; // postId를 설정합니다.
         connection.release();
 
-        // 삽입된 데이터의 ID를 가져와 수정을 위해 전송
-        const postId = results.insertId;
-
-        res.send({ postId, title, code, output, result, message: 'Post created successfully' });
+        res.send({ postId, title, code, result, message: 'Post created successfully' });
     } catch (error) {
         // 만약 컴파일 에러가 발생하면 여기서 처리
-        const errorMessage = error.output || error.toString(); // 에러 메시지가 output에 있다고 가정하고 처리
-        res.status(200).send({ postId: null, title, code, output: errorMessage, result: null, message: 'Failed to compile, but post created successfully' });
+        const errorMessage = error.result || error.toString(); 
+        
+        try {
+            // MySQL에 에러 메시지를 저장
+            const connection = await pool.getConnection();
+            const [insertResults, fields] = await connection.execute(
+                'INSERT INTO coreview.post (post_title, post_code, post_result, post_content, post_date, user_id, language) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
+                [title, code, errorMessage, content, user_id, language]
+            );
+            postId = insertResults.insertId; // postId를 설정합니다.
+            connection.release();
+
+            res.send({ postId, title, code, result: errorMessage, message: 'Post created with error' });
+        } catch (err) {
+            res.status(500).send({ error: err.toString(), message: 'Failed to save post with error' });
+        }
     }
 }
 
 async function updateCode(req, res) {
-    const { postId, title, code, result, content } = req.body;
+    const { postId, title, code, content } = req.body;
 
     try {
         // MySQL에 데이터 수정
@@ -61,7 +75,7 @@ async function updateCode(req, res) {
 
         // 수정된 데이터의 ID를 전송
         if (results.affectedRows > 0) {
-            res.send({ postId, title, code, result, message: 'Post updated successfully' });
+            res.send({ postId, title, code, message: 'Post updated successfully' });
         } else {
             res.status(404).send({ message: 'Post not found' });
         }
