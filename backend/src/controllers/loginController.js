@@ -15,8 +15,7 @@ const login = async (req, res) => {
     if (user && user.success) {
       res.status(200).send({
         user_id: user.user_id,
-        user_email: user.user_email,
-        user_nickname: user.user_nickname,
+
         // Add other necessary information, but do not include sensitive data like user_password
         message: "로그인이 성공적으로 처리되었습니다.",
       });
