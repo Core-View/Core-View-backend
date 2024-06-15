@@ -85,7 +85,7 @@ async function updateCode(req, res) {
 }
 
 async function deleteCode(req, res) {
-    const { postId } = req.body;
+    const { postId } = req.query;
 
     try {
         // MySQL에서 데이터 삭제
