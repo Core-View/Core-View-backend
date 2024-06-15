@@ -3,7 +3,7 @@ const SSEController = require('../controllers/sseController');
 const fs = require('fs');
 const controller = new SSEController();
 
-router.get('/start', (req, res) => controller.subscribe(req, res));
+router.get('/start/:user_id', (req, res) => controller.subscribe(req, res));
 
 router.get('/stop', (req,res) => controller.unsubscribe(res));
 

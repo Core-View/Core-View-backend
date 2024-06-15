@@ -12,14 +12,13 @@ const noticeImage = multer.diskStorage({
 	},
 	filename: (req, file, cb) => {
 		// (4)
-		imageNames.push(file.originalname);
 		cb(null, file.originalname); // (5)
 	},
 });
 
 const upload = multer({
 	// (6)
-	noticeImage,
+	storage: noticeImage,
 	fileFilter: (req, file, cb) => {
 		if (['image/jpeg', 'image/jpg', 'image/png'].includes(file.mimetype)) {
 			cb(null, true);

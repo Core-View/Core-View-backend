@@ -7,9 +7,9 @@ const getAlarm = async (user_id) => {
     FROM  alarm n
     JOIN feedback f ON n.feedback_id = f.feedback_id
     JOIN post p ON f.post_id = p.post_id
-    WHERE n.user_id = 1;`;
+    WHERE n.user_id = ?;`;
 
-    try{
+    try{ㄴ
         let [result] = await pool.query(sql, [user_id]);
 
         return result;

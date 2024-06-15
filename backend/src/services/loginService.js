@@ -15,7 +15,6 @@ const authenticate = async (user_email, inputPassword) => {
     const user = rows[0];
 
 
-
     // 저장된 해시된 비밀번호와 입력된 비밀번호 비교
     const isMatch = await comparePassword(inputPassword, user.user_password, user.user_salt);
 
