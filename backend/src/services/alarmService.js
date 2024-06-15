@@ -2,7 +2,7 @@ const pool = require("../../config/databaseSet");
 
 
 const getAlarm = async (user_id) => {
-
+    
     let sql = `SELECT n.alarm_id, n.alarm_date time, n.feedback_id, p.post_title title, n.alarm_check
     FROM  alarm n
     JOIN feedback f ON n.feedback_id = f.feedback_id
@@ -10,7 +10,7 @@ const getAlarm = async (user_id) => {
     WHERE n.user_id = ?
     ORDER BY n.alarm_date`;
 
-    try{ㄴ
+    try{
         let [result] = await pool.query(sql, [user_id]);
 
         return result;

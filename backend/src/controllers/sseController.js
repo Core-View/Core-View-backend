@@ -31,7 +31,7 @@ class SSEController {
         });
 
         let result = await alarmService.getAlarm(user_id);
-
+ 
         // 초기 메시지 전송
         this._sendMessage(res, result);
     }
