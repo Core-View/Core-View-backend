@@ -3,14 +3,14 @@ const router = express.Router();
 const postController = require('../controllers/postController');
 
 // 포스트 관련 라우트
-
 router.get('/search', postController.searchPostsByTitle);
 router.post('/like', postController.likePost); // 포스트 좋아요
-router.delete('/unlike', postController.unlikePost); // 포스트 좋아요 취소
+router.delete('/unlike/:post_id/:user_id', postController.unlikePost); // 포스트 좋아요 취소
 router.get('/latest', postController.getPostsByDate); // 최신 순으로 포스트 가져오기
 router.get('/mostlike', postController.getPostsByLikes); // 좋아요가 많은 순으로 포스트 가져오기
 router.get('/recent', postController.getRecent3Posts); // 최근 게시물 중에서 최신 3개 가져오기
 router.post('/contribution', postController.getUserContribution); // 사용자 기여도 가져오기
 router.get('/top-contributors', postController.getTop3Contributors); // 기여도가 높은 상위 3명의 사용자 가져오기
 router.get('/notice', postController.getNotice);
+
 module.exports = router;

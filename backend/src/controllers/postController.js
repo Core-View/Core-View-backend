@@ -23,9 +23,11 @@ exports.likePost = async (req, res) => {
   }
 };
 
+
+
 // 좋아요를 취소하는 함수
 exports.unlikePost = async (req, res) => {
-  const { post_id, user_id } = req.body; // 요청 본문에서 post_id와 user_id 가져오기
+  const { post_id, user_id } = req.params; // URL 파라미터에서 post_id와 user_id 가져오기
 
   if (!post_id || !user_id) {
     return res.status(400).json({ error: 'post_id 또는 user_id 파라미터가 없습니다.' });
@@ -44,6 +46,11 @@ exports.unlikePost = async (req, res) => {
     res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
+
+
+
+
+
 
 // 제목으로 포스트를 검색하는 함수
 exports.searchPostsByTitle = async (req, res) => {
