@@ -7,7 +7,8 @@ const getAlarm = async (user_id) => {
     FROM  alarm n
     JOIN feedback f ON n.feedback_id = f.feedback_id
     JOIN post p ON f.post_id = p.post_id
-    WHERE n.user_id = ?;`;
+    WHERE n.user_id = ?
+    ORDER BY n.alarm_date`;
 
     try{ㄴ
         let [result] = await pool.query(sql, [user_id]);
@@ -38,4 +39,18 @@ const postAlarm = async (post_id, feedback_id) => {
     }
 }
 
-module.exports = {getAlarm,postAlarm};
+const checkAlarm = async (req, res) => {
+    let sql = `UPDATE alarm set alarm_check = 1 where alarm_check = 0 and user_id = ?`;
+
+    try{
+        let [result] = await pool.query(sql, [req.body.user_id]);
+
+        res.status(200).send({success: true});
+    }catch(error){
+        console.log(error);
+
+        res.status(500).send({success: false, message: '데이터베이스 오류'});
+    }
+}
+
+module.exports = {getAlarm,postAlarm, checkAlarm};
