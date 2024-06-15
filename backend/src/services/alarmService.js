@@ -8,7 +8,7 @@ const getAlarm = async (user_id) => {
     JOIN feedback f ON n.feedback_id = f.feedback_id
     JOIN post p ON f.post_id = p.post_id
     WHERE n.user_id = ?
-    ORDER BY n.alarm_date`;
+    ORDER BY n.alarm_date DESC`;
 
     try{
         let [result] = await pool.query(sql, [user_id]);

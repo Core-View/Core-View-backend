@@ -36,7 +36,7 @@ router.get("/view", noticeController.noticeView);
 router.get("/view/:id", noticeController.noticeDetail);
 
 //삭제
-router.delete("/delete", noticeController.noticeDelete);
+router.delete("/delete/:id", noticeController.noticeDelete);
 
 //수정
 router.patch("/post", noticeController.noticeModify);
