@@ -1,114 +1,136 @@
 const feedbackService = require('../services/feedbackService');
 const { handleResponse } = require('../utils/responseUtil');
-const sseController = require('./sseController');
-const controller = new sseController();
-const alarmService = require('../services/alarmService');
+const pool = require('../../config/databaseSet');
 
 // 피드백 생성
 exports.createFeedback = async (req, res) => {
+    const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
     try {
-        const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
-        const feedbackData = { post_id, user_id, feedback_comment, feedback_codenumber };
-        const feedback = await feedbackService.createFeedback(feedbackData);
-        
-        controller.fileWrite(Math.random()); //파일 변경 감지.
-        const alarm = await alarmService.postAlarm(post_id, feedback.insertId); //알람 설정
-        
-        handleResponse(res, 201, feedback);
+      const query = 'INSERT INTO feedback (post_id, user_id, feedback_comment, feedback_codenumber) VALUES (?, ?, ?, ?)';
+      const [result] = await pool.query(query, [post_id, user_id, feedback_comment, feedback_codenumber]);
+      res.status(201).json(result);
     } catch (error) {
-        console.error('Error in createFeedback:', error);
-        handleResponse(res, 400, null, error);
+      console.error('Error in createFeedback:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };
 
 // 모든 피드백 조회
 exports.getAllFeedbacks = async (req, res) => {
     try {
-        const feedbacks = await feedbackService.getAllFeedbacks();
-        handleResponse(res, 200, feedbacks);
+      const [rows] = await pool.query('SELECT * FROM feedback');
+      res.json(rows);
     } catch (error) {
-        console.error('Error in getAllFeedbacks:', error);
-        handleResponse(res, 500, null, error);
+      console.error('Error in getAllFeedbacks:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };
 
 // 특정 피드백 조회
-exports.getFeedbackById = async (req, res) => {
-    try {
-        const feedback = await feedbackService.getFeedbackById(req.params.id);
-        if (!feedback) {
-            return handleResponse(res, 404, { error: 'Feedback not found' });
-        }
-        handleResponse(res, 200, feedback);
-    } catch (error) {
-        console.error('Error in getFeedbackById:', error);
-        handleResponse(res, 500, null, error);
-    }
+exports.getFeedbacksByPostId = async (req, res) => {
+  const post_id = req.params.post_id;
+  try {
+    const query = 'SELECT * FROM feedback WHERE post_id = ?';
+    console.log(`Executing query: ${query} with post_id: ${post_id}`); // 디버깅 로그 추가
+    const [rows] = await pool.query(query, [post_id]);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error in getFeedbacksByPostId:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
+
 
 // post_id로 특정 피드백 조회
 exports.getFeedbacksByPostId = async (req, res) => {
+    const post_id = req.params.post_id;
     try {
-        const feedbacks = await feedbackService.getFeedbacksByPostId(req.params.post_id);
-        if (!feedbacks || feedbacks.length === 0) {
-            return handleResponse(res, 404, { error: 'Feedbacks not found for the given post_id' });
-        }
-        handleResponse(res, 200, feedbacks);
+      const query = 'SELECT * FROM feedback WHERE post_id = ?';
+      const [rows] = await pool.query(query, [post_id]);
+      res.json(rows);
     } catch (error) {
-        console.error('Error in getFeedbacksByPostId:', error);
-        handleResponse(res, 500, null, error);
+      console.error('Error in getFeedbacksByPostId:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };
+
+// ID로 특정 피드백 조회
+exports.getFeedbackById = async (req, res) => {
+    const id = req.params.id;
+    try {
+      const [rows] = await pool.query('SELECT * FROM feedback WHERE feedback_id = ?', [id]);
+      if (rows.length > 0) {
+        res.json(rows[0]);
+      } else {
+        res.status(404).json({ error: 'Feedback not found' });
+      }
+    } catch (error) {
+      console.error('Error in getFeedbackById:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
 
 // 피드백 수정
 exports.updateFeedback = async (req, res) => {
+    const id = req.params.id;
+    const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
     try {
-        const feedback = await feedbackService.updateFeedback(req.params.id, req.body);
-        if (!feedback) {
-            return handleResponse(res, 404, { error: 'Feedback not found' });
-        }
-        handleResponse(res, 200, feedback);
+      const query = 'UPDATE feedback SET post_id = ?, user_id = ?, feedback_comment = ?, feedback_codenumber = ? WHERE feedback_id = ?';
+      const [result] = await pool.query(query, [post_id, user_id, feedback_comment, feedback_codenumber, id]);
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Feedback updated successfully' });
+      } else {
+        res.status(404).json({ error: 'Feedback not found' });
+      }
     } catch (error) {
-        console.error('Error in updateFeedback:', error);
-        handleResponse(res, 400, null, error);
+      console.error('Error in updateFeedback:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };
 
 // 피드백 삭제
 exports.deleteFeedback = async (req, res) => {
+    const id = req.params.id;
     try {
-        const feedback = await feedbackService.deleteFeedback(req.params.id);
-        if (!feedback) {
-            return handleResponse(res, 404, { error: 'Feedback not found' });
-        }
-        handleResponse(res, 200, feedback);
+      const query = 'DELETE FROM feedback WHERE feedback_id = ?';
+      const [result] = await pool.query(query, [id]);
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Feedback deleted successfully' });
+      } else {
+        res.status(404).json({ error: 'Feedback not found' });
+      }
     } catch (error) {
-        console.error('Error in deleteFeedback:', error);
-        handleResponse(res, 500, null, error);
+      console.error('Error in deleteFeedback:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };  
 
 // 피드백 좋아요 생성
 exports.createFeedbackLike = async (req, res) => {
+    const { user_id, feedback_id } = req.body;
     try {
-        const feedbackLike = await feedbackService.createFeedbackLike(req.body);
-        handleResponse(res, 201, feedbackLike);
+      const query = 'INSERT INTO feedback_likes (user_id, feedback_id) VALUES (?, ?)';
+      const [result] = await pool.query(query, [user_id, feedback_id]);
+      res.status(201).json(result);
     } catch (error) {
-        console.error('Error in createFeedbackLike:', error);
-        handleResponse(res, 400, null, error);
+      console.error('Error in createFeedbackLike:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };
 
 // 피드백 좋아요 삭제
 exports.deleteFeedbackLike = async (req, res) => {
+    const id = req.params.id;
     try {
-        const feedbackLike = await feedbackService.deleteFeedbackLike(req.params.id);
-        if (!feedbackLike) {
-            return handleResponse(res, 404, { error: 'Feedback like not found' });
-        }
-        handleResponse(res, 200, feedbackLike);
+      const query = 'DELETE FROM feedback_likes WHERE feedbacklike_id = ?';
+      const [result] = await pool.query(query, [id]);
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Feedback like deleted successfully' });
+      } else {
+        res.status(404).json({ error: 'Feedback like not found' });
+      }
     } catch (error) {
-        console.error('Error in deleteFeedbackLike:', error);
-        handleResponse(res, 500, null, error);
+      console.error('Error in deleteFeedbackLike:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-};
+  };
