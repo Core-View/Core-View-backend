@@ -68,10 +68,12 @@ exports.getPostsByDate = async (req, res) => {
       p.post_date, 
       p.language, 
       p.user_id,
+      u.user_nickname,
       COUNT(pl.post_id) AS total_likes
     FROM post p
+    LEFT JOIN user u ON p.user_id = u.user_id
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname
     ORDER BY p.post_date DESC
   `;
 
@@ -85,6 +87,8 @@ exports.getPostsByDate = async (req, res) => {
   }
 };
 
+
+
 // 좋아요가 많은 순으로 포스트를 정렬하는 함수
 exports.getPostsByLikes = async (req, res) => {
   const sqlQuery = `
@@ -94,10 +98,12 @@ exports.getPostsByLikes = async (req, res) => {
       p.post_date, 
       p.language, 
       p.user_id, 
+      u.user_nickname,
       COUNT(pl.post_id) AS total_likes 
     FROM post p 
+    LEFT JOIN user u ON p.user_id = u.user_id 
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id 
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id 
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname
     ORDER BY total_likes DESC
   `;
 
@@ -244,11 +250,13 @@ exports.getPostDetails = async (req, res) => {
       p.language, 
       p.user_id, 
       p.post_result,
+      u.user_nickname,
       COUNT(pl.post_id) AS total_likes
     FROM post p
+    LEFT JOIN user u ON p.user_id = u.user_id
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
     WHERE p.post_id = ?
-    GROUP BY p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language, p.user_id, p.post_result
+    GROUP BY p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language, p.user_id, p.post_result, u.user_nickname
   `;
 
   try {
@@ -263,5 +271,4 @@ exports.getPostDetails = async (req, res) => {
   } catch (err) {
     console.error('데이터베이스 오류:', err);
     res.status(500).json({ error: '데이터베이스 오류' });
-  }
-};
+  }};
