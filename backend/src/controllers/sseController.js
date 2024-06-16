@@ -54,7 +54,7 @@ class SSEController {
         console.log(result.alarm);
         console.log(result.count);
 
-        res.write(`data: ${result}\n\n`);
+        res.write(`data: ${JSON.stringify(result)}\n\n`);
     }
 
     fileWrite(data) {
