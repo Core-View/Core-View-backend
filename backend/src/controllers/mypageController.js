@@ -1,7 +1,9 @@
 const userService = require('../services/mypageService');
-const { hashPassword } = require("../utils/cryptoUtils");
+const { hashedPassword } = require("../utils/cryptoUtils");
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 class UserController {
   async getUser(req, res) {
@@ -17,56 +19,49 @@ class UserController {
       res.status(500).json({ message: "사용자 정보를 가져오는 중 에러 발생" });
     }
   }
+  
 
+  
   async modifyUser(req, res) {
     const user_id = req.params.user_id;
     const { user_nickname, user_password, user_password_confirm, user_intro } = req.body;
-
+  
     if (user_password !== user_password_confirm) {
       return res.status(400).json({ message: "비밀번호와 비밀번호 확인이 일치하지 않습니다." });
     }
-
+  
     try {
-      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null); // Pass null for image data
-      res.json(updatedUserInfo);
+     
+  
+      // Modify user info without image
+      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
+      return res.json(updatedUserInfo);
     } catch (error) {
       console.error("사용자 정보 수정 중 에러 발생:", error);
       if (error.message === "사용자를 찾을 수 없음") {
         return res.status(404).json({ message: "사용자를 찾을 수 없음" });
       }
-      res.status(500).json({ message: "사용자 정보 수정 중 에러 발생" });
+      return res.status(500).json({ message: "사용자 정보 수정 중 에러 발생" });
     }
   }
+  
 
   async modifyUserImage(req, res) {
     const user_id = req.params.user_id;
-
+  
     try {
       let imageFileName = null;
-      let previousImagePath = null;
-
       if (req.file && req.file.buffer) {
-        const user_image_data = req.file.buffer.toString('base64');
         const fileName = `${user_id}_${Date.now()}.png`;
-        const filePath = path.join(__dirname, '../../uploads/', fileName);
-
-        // 기존 이미지 경로 가져오기
-        const userInfo = await userService.getUserInfoByUserId(user_id);
-        previousImagePath = userInfo.profile_picture ? path.join(__dirname, '../../uploads/', userInfo.profile_picture) : null;
-
-        // 기존 이미지 삭제
-        if (previousImagePath) {
-          await fs.promises.unlink(previousImagePath);
-        }
-
-        // 새 이미지를 파일로 저장
-        await fs.promises.writeFile(filePath, user_image_data, 'base64');
-
+        const filePath = path.join(__dirname, '../../../../front/front/public/images/', fileName);
+  
+        // 이미지를 파일로 저장
+        await fs.promises.writeFile(filePath, req.file.buffer);
+  
         imageFileName = fileName;
       }
-
       const updatedUserImage = await userService.modifyUserImage(user_id, imageFileName);
-
+  
       res.json(updatedUserImage);
     } catch (error) {
       console.error("사용자 이미지 수정 중 에러 발생:", error);
@@ -76,7 +71,6 @@ class UserController {
       res.status(500).json({ message: "사용자 이미지 수정 중 에러 발생" });
     }
   }
-  
 
   async deleteUser(req, res) {
     const user_id = req.params.user_id;

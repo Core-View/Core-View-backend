@@ -23,7 +23,7 @@ const sendMail = async (to, subject, html,res) => {
       secure: true,
       auth: {
         type: "OAuth2",
-        user: "k.minju020129@gmail.com",
+        user: "coreview.team@gmail.com",
         clientId: process.env.MAIL_CLIENTID,
         clientSecret: process.env.MAIL_SECRET,
         refreshToken: process.env.MAIL_REFRESH,
@@ -32,7 +32,7 @@ const sendMail = async (to, subject, html,res) => {
       },
     }),
     mailOptions = {
-      from: "<core-view, k.minju020129@gmail.com>",
+      from: "<core-view, coreview.team@gmail.com>",
       to,
       subject,
       html,

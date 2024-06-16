@@ -1,7 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const virtualCompilerController = require('../controllers/virtualCompilerController');
+const { compileCode, updateCode, deleteCode } = require('../controllers/virtualCompilerController');
 
-router.post('/compile', virtualCompilerController.compileCode);
+// POST request to compile code
+router.post('/compile', compileCode);
+
+// PUT request to update code
+router.put('/update', updateCode);
+
+// DELETE request to delete code
+router.delete('/delete', deleteCode);
 
 module.exports = router;

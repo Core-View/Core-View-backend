@@ -1,5 +1,5 @@
+const { comparePassword } = require('../utils/cryptoUtils');
 const pool = require('../../config/databaseSet');
-const { hashPassword } = require('../utils/cryptoUtils');
 
 class PasswordService {
     async verifyPassword(userId, password) {
@@ -8,7 +8,7 @@ class PasswordService {
 
             // 사용자 정보 조회
             const [userRows] = await connection.query(
-                "SELECT user_id, user_password, user_salt FROM user WHERE user_id = ?", 
+                "SELECT user_password, user_salt FROM user WHERE user_id = ?", 
                 [userId]
             );
 
@@ -18,11 +18,15 @@ class PasswordService {
                 return { success: false, error: "User not found" };
             }
 
-            const user = userRows[0];
+            const { user_password, user_salt } = userRows[0];
 
-            // 저장된 salt와 암호화된 비밀번호를 이용하여 비밀번호 일치 여부 확인
-            const hashedPassword = hashPassword(password, user.user_salt);
-            const isMatch = user.user_password === hashedPassword;
+            // 출력: 사용자가 입력한 비밀번호, 저장된 비밀번호, 사용된 salt
+            console.log(`입력된 비밀번호: ${password}`);
+            console.log(`저장된 비밀번호: ${user_password}`);
+            console.log(`사용된 salt: ${user_salt}`);
+
+            // 입력된 비밀번호와 저장된 salt를 사용하여 비밀번호 검증
+            const isMatch = comparePassword(password, user_password, user_salt);
 
             if (isMatch) {
                 return { success: true, message: "Password verified" };
