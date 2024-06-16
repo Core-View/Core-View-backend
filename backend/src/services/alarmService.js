@@ -1,7 +1,4 @@
 const pool = require("../../config/databaseSet");
-const sseController = require('../controllers/sseController');
-const controller = new sseController();
-
 
 const getAlarm = async (user_id) => {
     
@@ -48,13 +45,12 @@ const postAlarm = async (post_id, feedback_id) => {
     }
 }
 
-const checkAlarm = async (req, res) => {
+async function checkAlarm (req, res) {
     let sql = `UPDATE alarm set alarm_check = 1 where alarm_check = 0 and user_id = ?`;
 
     try{
         let [result] = await pool.query(sql, [req.body.user_id]);
-        controller.fileWrite(Math.random());
-        res.status(200).send({success: true});
+
     }catch(error){
         console.log(error);
 

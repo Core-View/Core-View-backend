@@ -8,6 +8,12 @@ router.get('/start/:user_id', (req, res) => controller.subscribe(req, res));
 
 router.get('/stop', (req,res) => controller.unsubscribe(res));
 
-router.post('/alarmcheck',alarmService.checkAlarm);
+router.post('/alarmcheck', (req, res) => {
+    
+    alarmService.checkAlarm(req, res);
+
+    controller.fileWrite(Math.random());
+    
+});
 
 module.exports = router;

@@ -3,6 +3,7 @@ const path = require('path');
 const alarmService = require("../services/alarmService");
 
 class SSEController {
+    
     constructor() {
         this.cancelStreaming = false;
     }
