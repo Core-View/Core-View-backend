@@ -4,12 +4,19 @@ const pool = require('../../config/databaseSet');
 
 // 피드백 생성
 exports.createFeedback = async (req, res) => {
-  const { post_id, user_id, user_nickname, feedback_comment, feedback_codenumber } = req.body;
+  const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
   
   try {
     // 현재 날짜와 시간을 가져오기
     const feedbackDate = new Date();
     const formattedDate = feedbackDate.toISOString().slice(0, 19).replace('T', ' ');
+
+    // user_id로 user_nickname 조회
+    const [userRows] = await pool.query('SELECT user_nickname FROM user WHERE user_id = ?', [user_id]);
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const user_nickname = userRows[0].user_nickname;
     console.log('Feedback date:', formattedDate);
 
     // 피드백 생성
@@ -70,8 +77,15 @@ exports.getFeedbackById = async (req, res) => {
 // 피드백 수정
 exports.updateFeedback = async (req, res) => {
   const id = req.params.id;
-  const { post_id, user_id, user_nickname, feedback_comment, feedback_codenumber } = req.body;
+  const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
   try {
+    // user_id로 user_nickname 조회
+    const [userRows] = await pool.query('SELECT user_nickname FROM user WHERE user_id = ?', [user_id]);
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const user_nickname = userRows[0].user_nickname;
+
     const query = 'UPDATE feedback SET post_id = ?, user_id = ?, user_nickname = ?, feedback_comment = ?, feedback_codenumber = ? WHERE feedback_id = ?';
     const [result] = await pool.query(query, [post_id, user_id, user_nickname, feedback_comment, feedback_codenumber, id]);
     if (result.affectedRows > 0) {
