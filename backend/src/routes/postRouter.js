@@ -12,5 +12,6 @@ router.get('/recent', postController.getRecent3Posts); // 최근 게시물 중�
 router.post('/contribution', postController.getUserContribution); // 사용자 기여도 가져오기
 router.get('/top-contributors', postController.getTop3Contributors); // 기여도가 높은 상위 3명의 사용자 가져오기
 router.get('/notice', postController.getNotice);
+router.get('/details/:post_id', postController.getPostDetails);
 
 module.exports = router;

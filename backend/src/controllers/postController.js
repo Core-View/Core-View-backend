@@ -1,5 +1,4 @@
 const pool = require('../../config/databaseSet');
-const noticeService = require('../services/noticeService');
 
 // 좋아요를 받는 함수
 exports.likePost = async (req, res) => {
@@ -23,8 +22,6 @@ exports.likePost = async (req, res) => {
   }
 };
 
-
-
 // 좋아요를 취소하는 함수
 exports.unlikePost = async (req, res) => {
   const { post_id, user_id } = req.params; // URL 파라미터에서 post_id와 user_id 가져오기
@@ -47,11 +44,6 @@ exports.unlikePost = async (req, res) => {
   }
 };
 
-
-
-
-
-
 // 제목으로 포스트를 검색하는 함수
 exports.searchPostsByTitle = async (req, res) => {
   const { post_title } = req.query;
@@ -70,9 +62,17 @@ exports.searchPostsByTitle = async (req, res) => {
 // 최신 순으로 포스트를 정렬하는 함수
 exports.getPostsByDate = async (req, res) => {
   const sqlQuery = `
-    SELECT * 
-    FROM post 
-    ORDER BY post_date DESC
+    SELECT 
+      p.post_id, 
+      p.post_title, 
+      p.post_date, 
+      p.language, 
+      p.user_id,
+      COUNT(pl.post_id) AS total_likes
+    FROM post p
+    LEFT JOIN post_likes pl ON p.post_id = pl.post_id
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id
+    ORDER BY p.post_date DESC
   `;
 
   try {
@@ -88,10 +88,16 @@ exports.getPostsByDate = async (req, res) => {
 // 좋아요가 많은 순으로 포스트를 정렬하는 함수
 exports.getPostsByLikes = async (req, res) => {
   const sqlQuery = `
-    SELECT p.*, COUNT(pl.post_id) AS total_likes 
+    SELECT 
+      p.post_id, 
+      p.post_title, 
+      p.post_date, 
+      p.language, 
+      p.user_id, 
+      COUNT(pl.post_id) AS total_likes 
     FROM post p 
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id 
-    GROUP BY p.post_id 
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id 
     ORDER BY total_likes DESC
   `;
 
@@ -108,9 +114,17 @@ exports.getPostsByLikes = async (req, res) => {
 // 최근 게시물 중에서 최신 3개를 가져오는 함수
 exports.getRecent3Posts = async (req, res) => {
   const sqlQuery = `
-    SELECT * 
-    FROM post 
-    ORDER BY post_date DESC
+    SELECT 
+      p.post_id, 
+      p.post_title, 
+      p.post_date, 
+      p.language, 
+      p.user_id,
+      COUNT(pl.post_id) AS total_likes
+    FROM post p
+    LEFT JOIN post_likes pl ON p.post_id = pl.post_id
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id
+    ORDER BY p.post_date DESC
     LIMIT 3
   `;
 
@@ -207,6 +221,47 @@ exports.getTop3Contributors = async (req, res) => {
   }
 };
 
+// 공지사항을 가져오는 함수
 exports.getNotice = (req, res) => {
   noticeService.getNoticeToPost(req, res);
+};
+
+// 특정 post_id에 대한 모든 세부 정보를 가져오는 함수
+exports.getPostDetails = async (req, res) => {
+  const { post_id } = req.params;
+
+  if (!post_id) {
+    return res.status(400).json({ error: 'post_id 파라미터가 없습니다.' });
+  }
+
+  const sqlQuery = `
+    SELECT 
+      p.post_id, 
+      p.post_title, 
+      p.post_content, 
+      p.post_code, 
+      p.post_date, 
+      p.language, 
+      p.user_id, 
+      p.post_result,
+      COUNT(pl.post_id) AS total_likes
+    FROM post p
+    LEFT JOIN post_likes pl ON p.post_id = pl.post_id
+    WHERE p.post_id = ?
+    GROUP BY p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language, p.user_id, p.post_result
+  `;
+
+  try {
+    console.log('쿼리 실행 중:', sqlQuery);
+    const [results] = await pool.query(sqlQuery, [post_id]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: '포스트를 찾을 수 없습니다.' });
+    }
+
+    res.json(results[0]);
+  } catch (err) {
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
+  }
 };
