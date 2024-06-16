@@ -11,9 +11,9 @@ exports.createFeedback = async (req, res) => {
         const feedbackData = { post_id, user_id, feedback_comment, feedback_codenumber };
         const feedback = await feedbackService.createFeedback(feedbackData);
         
-        controller.fileWrite(Math.random()); //파일 변경 감지.
+        // controller.fileWrite(Math.random()); //파일 변경 감지.
         const alarm = await alarmService.postAlarm(post_id, feedback.insertId); //알람 설정
-        
+        controller.feedback();
         handleResponse(res, 201, feedback);
     } catch (error) {
         console.error('Error in createFeedback:', error);
