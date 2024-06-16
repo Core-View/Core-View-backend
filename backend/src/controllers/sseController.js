@@ -49,7 +49,7 @@ class SSEController {
         }
 
         console.log('[sse] sendMessage');
-
+        console.log(result);
         res.write('event: message\n');
         res.write(`data: ${JSON.stringify(result)}\n\n`);
     }

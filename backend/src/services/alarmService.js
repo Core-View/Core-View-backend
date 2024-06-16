@@ -3,7 +3,7 @@ const pool = require("../../config/databaseSet");
 
 const getAlarm = async (user_id) => {
     
-    let sql = `SELECT n.alarm_id, n.alarm_date time, f.post_id, p.post_title title, n.alarm_check, count(n.alarm_check=0) alarm_unreaded
+    let sql = `SELECT n.alarm_id, n.alarm_date time, f.post_id, p.post_title title, n.alarm_check
     FROM  alarm n
     JOIN feedback f ON n.feedback_id = f.feedback_id
     JOIN post p ON f.post_id = p.post_id
@@ -11,8 +11,13 @@ const getAlarm = async (user_id) => {
     ORDER BY n.alarm_date DESC`;
 
     try{
-        let [result] = await pool.query(sql, [user_id]);
+        let [alarm] = await pool.query(sql, [user_id]);
 
+        sql = `select ifnull(count(alarm_check),0) alarm_unreaded from alarm where user_id = ? and alarm_check = 0 group by (alarm_check)`;
+        
+        let [count] = await pool.query(sql, [user_id]);
+
+        let result = {alarm, count};
         return result;
     }catch(error){
         return null;
