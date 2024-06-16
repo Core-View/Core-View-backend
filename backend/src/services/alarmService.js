@@ -13,7 +13,9 @@ const getAlarm = async (user_id) => {
     try{
         let [alarm] = await pool.query(sql, [user_id]);
 
-        sql = `select ifnull(count(alarm_check),0) alarm_unreaded from alarm where user_id = ? and alarm_check = 0 group by (alarm_check)`;
+        sql = `SELECT COALESCE(COUNT(alarm_check), 0) AS alarm_unreaded 
+        FROM alarm 
+        WHERE user_id = ? AND alarm_check = 0;`;
         
         let [count] = await pool.query(sql, [user_id]);
 
