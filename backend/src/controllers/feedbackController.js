@@ -10,8 +10,7 @@ exports.createFeedback = async (req, res) => {
         const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
         const feedbackData = { post_id, user_id, feedback_comment, feedback_codenumber };
         const feedback = await feedbackService.createFeedback(feedbackData);
-        
-        // controller.fileWrite(Math.random()); //파일 변경 감지.
+
         const alarm = await alarmService.postAlarm(post_id, feedback.insertId); //알람 설정
 
         handleResponse(res, 201, feedback);

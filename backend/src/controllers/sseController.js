@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const alarmService = require("../services/alarmService");
 
@@ -52,7 +51,6 @@ class SSEController {
             return;
         }
 
-        console.log('[sse] sendMessage');
         res.write('event: message\n');
         res.write(`data: ${JSON.stringify(result)}\n\n`);
     }

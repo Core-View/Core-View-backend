@@ -33,7 +33,6 @@ const postAlarm = async (post_id, feedback_id) => {
     try{
         let [result] = await pool.query(sql, [post_id]);
 
-        console.log(result[0].USER_ID);
         let user_id = result[0].USER_ID;
         sql = `INSERT INTO ALARM (ALARM_DATE, FEEDBACK_ID, USER_ID, ALARM_CHECK) VALUES (now(),?,?,0)`;
 
