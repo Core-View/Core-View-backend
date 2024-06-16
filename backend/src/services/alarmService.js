@@ -38,7 +38,6 @@ const postAlarm = async (post_id, feedback_id) => {
         sql = `INSERT INTO ALARM (ALARM_DATE, FEEDBACK_ID, USER_ID, ALARM_CHECK) VALUES (now(),?,?,0)`;
 
         let [inser_result] = await pool.query(sql, [feedback_id,user_id]);
-
         
     }catch(error){
         console.log(error);
@@ -49,8 +48,7 @@ async function checkAlarm (req, res) {
     let sql = `UPDATE alarm set alarm_check = 1 where alarm_check = 0 and user_id = ?`;
 
     try{
-        let [result] = await pool.query(sql, [req.body.user_id]);
-
+        await pool.query(sql, [req.body.user_id]);
     }catch(error){
         console.log(error);
 

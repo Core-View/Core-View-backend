@@ -33,12 +33,11 @@ class SSEController {
             this.clients = this.clients.filter(client => client.id !== clientId);
         });
 
-
         // 주기적인 메시지 전송
         const intervalId = setInterval(async () => {
             let periodicResult = await alarmService.getAlarm(user_id);
             this._sendMessage(res, periodicResult);
-        }, 10000); // 10초마다 알림 전송
+        }, 500); // 10초마다 알림 전송
 
         req.on('close', () => {
             clearInterval(intervalId);
@@ -46,16 +45,16 @@ class SSEController {
         });
     }
 
-    async feedback() {
+    _sendMessage(res, result) {
+        if (this.cancelStreaming) {
+            res.end();
+            this.cancelStreaming = false;
+            return;
+        }
 
-        // 알림 전송
-        this.sendNotification({ message: '새 피드백이 달렸습니다!' });
-
-        res.status(200).send('Feedback received');
-    }
-
-    sendNotification(data) {
-        this.clients.forEach(client => this._sendMessage(client.res, data));
+        console.log('[sse] sendMessage');
+        res.write('event: message\n');
+        res.write(`data: ${JSON.stringify(result)}\n\n`);
     }
 
     unsubscribe(res) {

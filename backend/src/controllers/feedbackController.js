@@ -13,7 +13,7 @@ exports.createFeedback = async (req, res) => {
         
         // controller.fileWrite(Math.random()); //파일 변경 감지.
         const alarm = await alarmService.postAlarm(post_id, feedback.insertId); //알람 설정
-        controller.feedback();
+
         handleResponse(res, 201, feedback);
     } catch (error) {
         console.error('Error in createFeedback:', error);
