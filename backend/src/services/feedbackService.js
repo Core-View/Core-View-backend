@@ -11,9 +11,14 @@ exports.createFeedback = async (data) => {
   `;
   try {
     const [result] = await pool.query(query, [post_id, user_id, feedback_date, feedback_comment, feedback_codenumber]);
+
+    //피드백 작성한 유저의 기여도 증가
+    let sql = `UPDATE user set user_contribute = user_contribute + 1 where user_id = ?`;
+
+    await pool.query(sql, [user_id]);
     return result;
   } catch (error) {
-    console.error('Error in createFeedback:', error);
+    console.error('Error in createFeedback:', error); 
     throw error;
   }
 };
@@ -75,6 +80,22 @@ exports.updateFeedback = async (id, data) => {
 exports.deleteFeedback = async (id) => {
   const query = `DELETE FROM feedback WHERE feedback_id = ?`;
   try {
+
+    //피드백 작성한 유저의 user_id를 가져옴
+    let sql = `SELECT USER_ID FROM FEEDBACK WHERE FEEDBACK_ID = ?`;
+    
+    const[user] = await pool.query(sql, [id]);
+
+    //피드백 삭제하면 피드백 작성한 유저의 기여도 감소
+    sql = `UPDATE user
+    SET user_contribute = CASE
+        WHEN user_contribute > 0 THEN user_contribute - 1
+        ELSE 0
+    END
+    WHERE user_id = ?`;
+
+    await pool.query(sql, [user[0].USER_ID]);
+
     const [result] = await pool.query(query, [id]);
     return result;
   } catch (error) {
@@ -92,6 +113,18 @@ exports.createFeedbackLike = async (data) => {
   `;
   try {
     const [result] = await pool.query(query, [user_id, feedback_id]);
+
+    //피드백 작성한 유저의 아이디
+    let sql = `SELECT user_id from feedback where feedback_id = ?`; 
+
+    const [feedback_user_id] = await pool.query(sql, [feedback_id]);
+    console.log("dfdf",feedback_user_id);
+
+    //피드백 작성한 유저의 기여도 상승
+    sql = `UPDATE user set user_contribute = user_contribute+1 where user_id = ?`;
+    
+    await pool.query(sql, [feedback_user_id[0].user_id]);
+
     return result;
   } catch (error) {
     console.error('Error in createFeedbackLike:', error);
@@ -103,7 +136,26 @@ exports.createFeedbackLike = async (data) => {
 exports.deleteFeedbackLike = async (id) => {
   const query = `DELETE FROM feedback_likes WHERE feedbacklike_id = ?`;
   try {
+
+    //피드백 작성한 유저의 아이디 가져오기
+    let sql = `SELECT user_id from feedback where feedback_id = ?`; 
+
+    const [feedback_user_id] = await pool.query(sql, [id]);
+
+    //피드백 삭제
     const [result] = await pool.query(query, [id]);
+
+    //삭제 후 피드백 작성한 유저의 기여도 감소
+    sql = `UPDATE user
+    SET user_contribute = CASE
+        WHEN user_contribute > 0 THEN user_contribute - 1
+        ELSE 0
+    END
+    WHERE user_id = ?`;
+
+    console.log("dfdf",feedback_user_id);
+
+    await pool.query(sql, [feedback_user_id[0].user_id]);
     return result;
   } catch (error) {
     console.error('Error in deleteFeedbackLike:', error);
