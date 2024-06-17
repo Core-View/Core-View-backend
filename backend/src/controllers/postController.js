@@ -8,13 +8,25 @@ exports.likePost = async (req, res) => {
     return res.status(400).json({ error: 'post_id 또는 user_id 파라미터가 없습니다.' });
   }
 
-  const sqlQuery = `
+  // 중복 여부를 확인하는 쿼리
+  const checkDuplicateQuery = `
+    SELECT * FROM post_likes WHERE post_id = ? AND user_id = ?
+  `;
+
+  const insertLikeQuery = `
     INSERT INTO post_likes (post_id, user_id, post_likes_date) VALUES (?, ?, NOW()) 
   `;
 
   try {
-    console.log('쿼리 실행 중:', sqlQuery);
-    await pool.query(sqlQuery, [post_id, user_id]);
+    console.log('중복 체크 쿼리 실행 중:', checkDuplicateQuery);
+    const [existingLikes] = await pool.query(checkDuplicateQuery, [post_id, user_id]);
+
+    if (existingLikes.length > 0) {
+      return res.status(400).json({ error: '이미 이 포스트를 좋아요 했습니다.' });
+    }
+
+    console.log('좋아요 추가 쿼리 실행 중:', insertLikeQuery);
+    await pool.query(insertLikeQuery, [post_id, user_id]);
     res.status(201).json({ message: '포스트가 성공적으로 좋아요 되었습니다.' });
   } catch (err) {
     console.error('데이터베이스 오류:', err);
@@ -46,7 +58,7 @@ exports.unlikePost = async (req, res) => {
 
 // 제목으로 포스트를 검색하는 함수
 exports.searchPostsByTitle = async (req, res) => {
-  const { post_title } = req.query;
+  const { post_title } = req.params;
   try {
     const [rows, fields] = await pool.query(
       `SELECT * FROM post WHERE post_title LIKE ?`,
