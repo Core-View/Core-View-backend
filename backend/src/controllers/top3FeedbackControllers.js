@@ -7,9 +7,10 @@ exports.getTop3Feedback = async (req, res) => {
   const twoWeeksAgoFormatted = twoWeeksAgo.toISOString().split('T')[0];
 
   const sqlQuery = `
-    SELECT f.*, COUNT(fl.feedback_id) AS total_likes 
+    SELECT f.*, u.user_contribute, COUNT(fl.feedback_id) AS total_likes 
     FROM feedback f
     LEFT JOIN feedback_likes fl ON f.feedback_id = fl.feedback_id
+    LEFT JOIN user u ON f.user_id = u.user_id 
     WHERE f.feedback_date >= ?
     GROUP BY f.feedback_id 
     ORDER BY total_likes DESC

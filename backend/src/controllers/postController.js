@@ -96,11 +96,12 @@ exports.getPostsByDate = async (req, res) => {
       p.language, 
       p.user_id,
       u.user_nickname,
+      u.user_contribute,
       COUNT(pl.post_id) AS total_likes
     FROM post p
     LEFT JOIN user u ON p.user_id = u.user_id
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname,u.user_contribute
     ORDER BY p.post_date DESC
   `;
 
@@ -126,11 +127,12 @@ exports.getPostsByLikes = async (req, res) => {
       p.language, 
       p.user_id, 
       u.user_nickname,
+      u.user_contribute,
       COUNT(pl.post_id) AS total_likes 
     FROM post p 
     LEFT JOIN user u ON p.user_id = u.user_id 
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id 
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname,u.user_contribute
     ORDER BY total_likes DESC
   `;
 
@@ -153,10 +155,12 @@ exports.getRecent3Posts = async (req, res) => {
       p.post_date, 
       p.language, 
       p.user_id,
+      u.user_contribute,
       COUNT(pl.post_id) AS total_likes
     FROM post p
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id
+    LEFT JOIN user u ON p.user_id = u.user_id 
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id,u.user_contribute
     ORDER BY p.post_date DESC
     LIMIT 3
   `;
@@ -245,13 +249,14 @@ exports.getPostDetails = async (req, res) => {
       p.user_id, 
       p.post_result,
       u.user_nickname,
-      u.user_image
+      u.user_image,
+      u.user_contribute,
       COUNT(pl.post_id) AS total_likes
     FROM post p
     LEFT JOIN user u ON p.user_id = u.user_id
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
     WHERE p.post_id = ?
-    GROUP BY p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language, p.user_id, p.post_result, u.user_nickname
+    GROUP BY p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language, p.user_id, p.post_result, u.user_nickname,u.user_contribute
   `;
 
   try {
