@@ -263,7 +263,7 @@ exports.getPostDetails = async (req, res) => {
       p.user_id, 
       p.post_result,
       u.user_nickname,
-      u.user_image
+      u.user_image,
       COUNT(pl.post_id) AS total_likes
     FROM post p
     LEFT JOIN user u ON p.user_id = u.user_id
