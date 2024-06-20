@@ -1,7 +1,7 @@
 const signUpService = require("../services/signUpService");
 const loginService = require("../services/loginService");
 const mailer = require("./mailer");
-
+//회원가입 컨트롤러
 const signUp = async (req, res) => {
   const { user_name,user_nickname, user_email, user_password } = req.body;
   try {
