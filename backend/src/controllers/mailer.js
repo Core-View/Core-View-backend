@@ -37,6 +37,7 @@ const sendMail = async (to, subject, html,res) => {
       subject,
       html,
     };
+    //adsßgit add
   try {
     await googleTransporter.sendMail(mailOptions);
     googleTransporter.close();
