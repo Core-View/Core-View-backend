@@ -25,4 +25,7 @@ router.get('/:user_id/posts', userController.getUserPosts.bind(userController));
 // 사용자 피드백 조회
 router.get('/:user_id/feedback', userController.getUserFeedback.bind(userController));
 
+// 사용자가 좋아요를 누른 게시물 조회
+router.get('/:user_id/likedPosts', userController.getLikedPosts.bind(userController));
+
 module.exports = router;

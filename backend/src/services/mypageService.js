@@ -7,62 +7,90 @@ const path = require('path');
 class UserService {
   async getUserInfoByUserId(user_id) {
     try {
+        const connection = await pool.getConnection();
+  
+        // 사용자가 받은 좋아요 수를 계산하는 쿼리
+        const [likesReceivedRows] = await connection.query(
+            "SELECT COUNT(*) AS likes_received " +
+            "FROM post " +
+            "JOIN post_likes ON post.post_id = post_likes.post_id " +
+            "WHERE post.user_id = ?",
+            [user_id]
+        );
+  
+        // 사용자 정보를 가져오는 쿼리
+        const [userRows] = await connection.query(
+            "SELECT u.user_id, u.user_nickname AS nickname, u.user_email AS email, u.user_password AS password, u.user_image AS profile_picture, u.user_intro AS introduction, u.user_contribute AS contribute " +
+            "FROM user u " +
+            "WHERE u.user_id = ?",
+            [user_id]
+        );
+  
+        console.log("사용자 정보 조회 완료:", userRows);
+  
+        connection.release();
+  
+        if (userRows.length === 0) {
+            throw new Error("사용자를 찾을 수 없음");
+        }
+  
+        const userInfo = {
+            user_id: userRows[0].user_id,
+            email: userRows[0].email,
+            nickname: userRows[0].nickname,
+            profile_picture: `${userRows[0].profile_picture}`, // 이미지 경로 생성
+            introduction: userRows[0].introduction,
+            contribute: userRows[0].contribute,
+            likes_received: likesReceivedRows[0].likes_received // 사용자가 받은 좋아요 수
+        };
+  
+        return userInfo;
+    } catch (error) {
+        console.error("사용자 정보를 가져오는 중 에러 발생:", error);
+        throw error;
+    }
+}
+
+  
+  
+async getLikedPosts(user_id) {
+  try {
       const connection = await pool.getConnection();
-  
-      // 사용자가 받은 좋아요 수를 계산하는 쿼리
-      const [likesReceivedRows] = await connection.query(
-        "SELECT COUNT(*) AS likes_received " +
-        "FROM post " +
-        "JOIN post_likes ON post.post_id = post_likes.post_id " +
-        "WHERE post.user_id = ?",
-        [user_id]
+
+      console.log(`사용자 ID: ${user_id} - 좋아요 누른 게시물 가져오기 시작`);
+
+      // 사용자가 좋아요를 누른 게시물을 가져오는 쿼리
+      const [likedPostsRows] = await connection.query(
+          `SELECT p.post_id, p.post_title, p.post_date, p.language, u.user_id as post_user_id, u.user_nickname as user_nickname
+           FROM post_likes pl 
+           JOIN post p ON pl.post_id = p.post_id 
+           JOIN user u ON p.user_id = u.user_id
+           WHERE pl.user_id = ?`,
+          [user_id]
       );
-  
-      // 사용자 정보와 게시물 정보를 가져오는 쿼리
-      const [userRows] = await connection.query(
-        "SELECT u.user_id, u.user_nickname AS nickname, u.user_email AS email, u.user_password AS password, u.user_image AS profile_picture, u.user_intro AS introduction, u.user_contribute AS contribute, " +
-        "p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language " +
-        "FROM user u " +
-        "LEFT JOIN post p ON u.user_id = p.user_id " +
-        "WHERE u.user_id = ?",
-        [user_id]
-      );
-  
-      console.log("사용자 정보 조회 완료:", userRows);
-  
+
       connection.release();
-  
-      if (userRows.length === 0) {
-        throw new Error("사용자를 찾을 수 없음");
-      }
-  
-      const userInfo = {
-        user_id: userRows[0].user_id,
-        email: userRows[0].email,
-        nickname: userRows[0].nickname,
-        profile_picture: `${userRows[0].profile_picture}`, // 이미지 경로 생성
-        introduction: userRows[0].introduction,
-        contribute: userRows[0].contribute,
-        likes_received: likesReceivedRows[0].likes_received, // 사용자가 받은 좋아요 수
-        posts: userRows.map(row => ({
+
+      console.log(`좋아요 누른 게시물 수: ${likedPostsRows.length}`);
+      
+      // 좋아요를 누른 게시물 정보를 반환
+      return likedPostsRows.map(row => ({
           post_id: row.post_id,
           post_title: row.post_title,
-          post_content: row.post_content,
-          post_code: row.post_code,
           post_date: row.post_date,
-          language: row.language
-        }))
-      };
-  
-      return userInfo;
-    } catch (error) {
-      console.error("사용자 정보를 가져오는 중 에러 발생:", error);
+          language: row.language,
+          user_id: row.post_user_id,
+          user_nickname: row.user_nickname
+      }));
+  } catch (error) {
+      console.error("좋아요를 누른 게시물을 가져오는 중 에러 발생:", error);
       throw error;
-    }
   }
-  
-  
-  
+}
+
+
+
+
   
   async modifyUserInfo(user_id, user_nickname, user_password, user_intro) {
     try {
@@ -171,58 +199,81 @@ async modifyUserImage(user_id, imageFileName) {
   }
   
 
-  async getUserPosts(user_id) {
+async getUserPosts(user_id) {
     try {
-      const connection = await pool.getConnection();
+        const connection = await pool.getConnection();
 
-      const [posts] = await connection.query(
-        "SELECT post_id, post_title FROM post WHERE user_id = ?", 
-        [user_id]
-      );
+        const [posts] = await connection.query(
+            `SELECT p.post_id, p.post_title, p.language, p.post_date, u.user_id, u.user_nickname
+             FROM post p
+             JOIN user u ON p.user_id = u.user_id
+             WHERE p.user_id = ?`,
+            [user_id]
+        );
 
-      console.log("사용자 게시물 조회 완료:", posts);
+        console.log("사용자 게시물 조회 완료:", posts);
 
-      connection.release();
+        connection.release();
 
-      if (posts.length === 0) {
-        throw new Error("게시물을 찾을 수 없음");
-      }
+        if (posts.length === 0) {
+            throw new Error("게시물을 찾을 수 없음");
+        }
 
-      return posts.map(post => ({ post_id: post.post_id, post_title: post.post_title }));
+        return posts.map(post => ({
+            post_id: post.post_id,
+            post_title: post.post_title,
+            language: post.language,
+            post_date: post.post_date,
+            user_id: post.user_id,
+            user_nickname: post.user_nickname
+        }));
     } catch (error) {
-      console.error("사용자 게시물을 가져오는 중 에러 발생:", error);
-      throw error;
+        console.error("사용자 게시물을 가져오는 중 에러 발생:", error);
+        throw error;
     }
-  }
+}
 
-  async getUserFeedback(user_id) {
-    try {
+
+
+async getUserFeedback(user_id) {
+  try {
       const connection = await pool.getConnection();
-  
-      // feedback 테이블과 post 테이블을 조인하여 post_id와 post_title을 가져오는 쿼리
+
+      // feedback 테이블과 post 테이블을 조인하여 post_id, post_title, user_id, nickname, post_date, feedback_date을 가져오는 쿼리
       const [feedbacks] = await connection.query(
-        `SELECT post.post_id, post.post_title 
-         FROM feedback 
-         JOIN post ON feedback.post_id = post.post_id 
-         WHERE feedback.user_id = ?`, 
-        [user_id]
+          `SELECT p.post_id, p.post_title, u.user_id, u.user_nickname as nickname, p.post_date, f.feedback_date
+           FROM feedback f
+           JOIN post p ON f.post_id = p.post_id 
+           JOIN user u ON p.user_id = u.user_id
+           WHERE f.user_id = ?`,
+          [user_id]
       );
-  
+
       console.log("사용자 피드백 조회 완료:", feedbacks);
-  
+
       connection.release();
-  
+
       if (feedbacks.length === 0) {
-        throw new Error("피드백을 찾을 수 없음");
+          throw new Error("피드백을 찾을 수 없음");
       }
-  
+
       // 피드백 정보를 반환 형식에 맞게 변환
-      return feedbacks.map(feedback => ({ post_id: feedback.post_id, post_title: feedback.post_title }));
-    } catch (error) {
+      return feedbacks.map(feedback => ({
+          post_id: feedback.post_id,
+          post_title: feedback.post_title,
+          user_id: feedback.user_id,
+          nickname: feedback.nickname,
+          post_date: feedback.post_date,
+          language: feedback.language_date
+      }));
+  } catch (error) {
       console.error("사용자 피드백을 가져오는 중 에러 발생:", error);
       throw error;
-    }
   }
+}
+
+
+
 }
 
 module.exports = new UserService();
