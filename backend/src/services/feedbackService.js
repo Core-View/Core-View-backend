@@ -49,7 +49,12 @@ exports.getFeedbackById = async (id) => {
 
 // post_id로 특정 피드백 조회
 exports.getFeedbacksByPostId = async (post_id) => {
-  const query = `SELECT * FROM feedback WHERE post_id = ?`;
+  const query = `
+    SELECT f.*, u.user_nickname
+    FROM feedback f
+    JOIN user u ON f.user_id = u.user_id
+    WHERE f.post_id = ?
+  `; // DB 연동 및 user_nickname 포함
   try {
     const [rows] = await pool.query(query, [post_id]);
     return rows;
