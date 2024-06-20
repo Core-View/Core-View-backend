@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { compileCode, updateCode, deleteCode } = require('../controllers/virtualCompilerController');
+const {
+  compileCode,
+  updateCode,
+  deleteCode,
+} = require('../controllers/virtualCompilerController');
 
 // POST request to compile code
 router.post('/compile', compileCode);
@@ -9,6 +13,6 @@ router.post('/compile', compileCode);
 router.put('/update', updateCode);
 
 // DELETE request to delete code
-router.delete('/delete', deleteCode);
+router.delete('/delete/:postId', deleteCode);
 
 module.exports = router;
