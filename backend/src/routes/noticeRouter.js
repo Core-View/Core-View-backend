@@ -8,7 +8,7 @@ const noticeImage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		// (3)
 
-		cb(null, '../../../Front-End/front/public/images/post_notice');
+		cb(null, '../../../../Front-End/front/public/images/post_notice');
 	},
 	filename: (req, file, cb) => {
 		// (4)
