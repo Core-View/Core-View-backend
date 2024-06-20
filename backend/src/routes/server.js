@@ -53,7 +53,7 @@ app.use("/logout", logoutRouter);
 app.use('/api', virtualCompilerRouter);
 app.use("/mypage", mypageRouter);
 app.use('/', profileRouter);
-
+app.use('/admin', adminRouter);
 app.use("/post", postRouter); 
 app.use("/", top3PostsRouter); 
 app.use("/", top3FeedbackRouter);
