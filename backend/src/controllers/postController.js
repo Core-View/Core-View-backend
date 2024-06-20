@@ -17,7 +17,22 @@ exports.likePost = async (req, res) => {
     INSERT INTO post_likes (post_id, user_id, post_likes_date) VALUES (?, ?, NOW()) 
   `;
 
+  const checkPostAuthorQuery = `
+    SELECT user_id FROM post WHERE post_id = ?
+  `;
+
   try {
+    // 포스트 작성자 확인
+    const [postAuthor] = await pool.query(checkPostAuthorQuery, [post_id]);
+    
+    if (postAuthor.length === 0) {
+      return res.status(404).json({ error: '해당 포스트를 찾을 수 없습니다.' });
+    }
+
+    if (postAuthor[0].user_id === user_id) {
+      return res.status(400).json({ error: '본인의 포스트는 좋아요 할 수 없습니다.' });
+    }
+
     console.log('중복 체크 쿼리 실행 중:', checkDuplicateQuery);
     const [existingLikes] = await pool.query(checkDuplicateQuery, [post_id, user_id]);
 
@@ -160,39 +175,24 @@ exports.getRecent3Posts = async (req, res) => {
 exports.getUserContribution = async (req, res) => {
   const { user_id } = req.body; // 요청 본문에서 user_id 가져오기
 
-  const postLikesQuery = `
-    SELECT COUNT(*) AS post_likes
-    FROM post_likes
-    WHERE user_id = ?
-  `;
-
-  const feedbackLikesQuery = `
-    SELECT COUNT(*) AS feedback_likes
-    FROM feedback_likes
-    WHERE user_id = ?
-  `;
-
-  const feedbackCountQuery = `
-    SELECT COUNT(*) AS feedback_count
-    FROM feedback
+  const userContributionQuery = `
+    SELECT user_contribute
+    FROM user
     WHERE user_id = ?
   `;
 
   try {
     console.log('쿼리 실행 중: 사용자 기여도');
     
-    const [[postLikesResult]] = await pool.query(postLikesQuery, [user_id]);
-    const [[feedbackLikesResult]] = await pool.query(feedbackLikesQuery, [user_id]);
-    const [[feedbackCountResult]] = await pool.query(feedbackCountQuery, [user_id]);
+    const [[userContributionResult]] = await pool.query(userContributionQuery, [user_id]);
 
-    const totalContribution = postLikesResult.post_likes + feedbackLikesResult.feedback_likes + feedbackCountResult.feedback_count;
+    if (!userContributionResult) {
+      return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+    }
 
     res.json({
       user_id,
-      post_likes: postLikesResult.post_likes,
-      feedback_likes: feedbackLikesResult.feedback_likes,
-      feedback_count: feedbackCountResult.feedback_count,
-      total_contribution: totalContribution
+      user_contribute: userContributionResult.user_contribute
     });
   } catch (err) {
     console.error('데이터베이스 오류:', err);
@@ -204,28 +204,10 @@ exports.getUserContribution = async (req, res) => {
 exports.getTop3Contributors = async (req, res) => {
   const sqlQuery = `
     SELECT 
-      u.user_id, 
-      IFNULL(post_likes.total, 0) AS post_likes, 
-      IFNULL(feedback_likes.total, 0) AS feedback_likes, 
-      IFNULL(feedback_count.total, 0) AS feedback_count,
-      (IFNULL(post_likes.total, 0) + IFNULL(feedback_likes.total, 0) + IFNULL(feedback_count.total, 0)) AS total_contribution 
-    FROM user u 
-    LEFT JOIN (
-      SELECT user_id, COUNT(*) AS total
-      FROM post_likes
-      GROUP BY user_id
-    ) post_likes ON u.user_id = post_likes.user_id 
-    LEFT JOIN (
-      SELECT user_id, COUNT(*) AS total
-      FROM feedback_likes
-      GROUP BY user_id
-    ) feedback_likes ON u.user_id = feedback_likes.user_id 
-    LEFT JOIN (
-      SELECT user_id, COUNT(*) AS total
-      FROM feedback
-      GROUP BY user_id
-    ) feedback_count ON u.user_id = feedback_count.user_id
-    ORDER BY total_contribution DESC
+      user_id, 
+      user_contribute
+    FROM user
+    ORDER BY user_contribute DESC
     LIMIT 3
   `;
 
