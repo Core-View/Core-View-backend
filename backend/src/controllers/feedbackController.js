@@ -9,6 +9,13 @@ exports.createFeedback = async (req, res) => {
       const query = 'INSERT INTO feedback (post_id, user_id, feedback_comment, feedback_codenumber) VALUES (?, ?, ?, ?)';
       const [result] = await pool.query(query, [post_id, user_id, feedback_comment, feedback_codenumber]);
       res.status(201).json(result);
+        const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
+        const feedbackData = { post_id, user_id, feedback_comment, feedback_codenumber };
+        const feedback = await feedbackService.createFeedback(feedbackData);
+
+        const alarm = await alarmService.postAlarm(post_id, feedback.insertId); //알람 설정
+
+        handleResponse(res, 201, feedback);
     } catch (error) {
       console.error('Error in createFeedback:', error);
       res.status(500).json({ error: 'Internal Server Error' });

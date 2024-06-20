@@ -12,7 +12,7 @@ const noticeDetail = (req, res) => {
 }
 
 const noticeDelete = (req, res) => {
-    let notice_id = req.get('notice_id');
+    let notice_id = req.params.id;
 
     noticeService.deleteNotice(notice_id, res);
 }
@@ -32,5 +32,6 @@ const noticePost = (req, res) => {
 const noticeUser = (req, res) => {
     noticeService.getUser(req, res);
 }
+
 
 module.exports = {noticeView, noticeDetail, noticeDelete, noticeModify, noticePost, noticeUser}

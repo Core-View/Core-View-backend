@@ -62,8 +62,6 @@ app.use('/sse/streaming', alarmRouter);
 app.use('/password', passwordRouter);
 // app.use('/', homeRouter); // 홈 페이지 라우터 사용(구글 소셜로그인 테스트용 삭제 해주셔도 됩니다)
 
-console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
-
 app.use('/api', feedbackRouter);
 
 // 에러 핸들링 미들웨어 추가

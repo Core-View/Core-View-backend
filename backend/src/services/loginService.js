@@ -15,7 +15,6 @@ const authenticate = async (user_email, inputPassword) => {
     const user = rows[0];
 
 
-
     // 저장된 해시된 비밀번호와 입력된 비밀번호 비교
     const isMatch = await comparePassword(inputPassword, user.user_password, user.user_salt);
 
@@ -30,8 +29,6 @@ const authenticate = async (user_email, inputPassword) => {
     return {
       success: true,
       user_id: user.user_id,
-      user_email: user.user_email,
-      user_nickname: user.user_nickname,
       // 필요한 경우 추가 정보 반환
     };
   } catch (err) {
