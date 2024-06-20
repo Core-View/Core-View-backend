@@ -20,7 +20,19 @@ class UserController {
     }
   }
   
+  async getLikedPosts(req, res) {
+    const { user_id } = req.params;
 
+    try {
+        console.log(`사용자 ID: ${user_id} - 좋아요 누른 게시물 요청 수신`);
+        const likedPosts = await userService.getLikedPosts(user_id);
+        console.log("좋아요를 누른 게시물:", likedPosts);
+        res.status(200).json(likedPosts);
+    } catch (error) {
+        console.error("좋아요를 누른 게시물 정보를 가져오는 중 에러 발생:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
   
   async modifyUser(req, res) {
     const user_id = req.params.user_id;
