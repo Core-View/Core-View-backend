@@ -236,40 +236,41 @@ async getUserPosts(user_id) {
 
 
 async getUserFeedback(user_id) {
-  try {
-      const connection = await pool.getConnection();
+    try {
+        const connection = await pool.getConnection();
 
-      // feedback 테이블과 post 테이블을 조인하여 post_id, post_title, user_id, nickname, post_date, feedback_date을 가져오는 쿼리
-      const [feedbacks] = await connection.query(
-          `SELECT p.post_id, p.post_title, u.user_id, u.user_nickname as nickname, p.post_date, f.feedback_date
-           FROM feedback f
-           JOIN post p ON f.post_id = p.post_id 
-           JOIN user u ON p.user_id = u.user_id
-           WHERE f.user_id = ?`,
-          [user_id]
-      );
+        // feedback 테이블과 post 테이블을 조인하여 post_id, post_title, user_id, nickname, post_date, feedback_date, language을 가져오는 쿼리
+        const [feedbacks] = await connection.query(
+            `SELECT p.post_id, p.post_title, u.user_id, u.user_nickname as nickname, p.post_date, f.feedback_date, p.language
+             FROM feedback f
+             JOIN post p ON f.post_id = p.post_id 
+             JOIN user u ON p.user_id = u.user_id
+             WHERE f.user_id = ?`,
+            [user_id]
+        );
 
-      console.log("사용자 피드백 조회 완료:", feedbacks);
+        console.log("사용자 피드백 조회 완료:", feedbacks);
 
-      connection.release();
+        connection.release();
 
-      if (feedbacks.length === 0) {
-          throw new Error("피드백을 찾을 수 없음");
-      }
+        if (feedbacks.length === 0) {
+            throw new Error("피드백을 찾을 수 없음");
+        }
 
-      // 피드백 정보를 반환 형식에 맞게 변환
-      return feedbacks.map(feedback => ({
-          post_id: feedback.post_id,
-          post_title: feedback.post_title,
-          user_id: feedback.user_id,
-          nickname: feedback.nickname,
-          post_date: feedback.post_date,
-          language: feedback.language_date
-      }));
-  } catch (error) {
-      console.error("사용자 피드백을 가져오는 중 에러 발생:", error);
-      throw error;
-  }
+        // 피드백 정보를 반환 형식에 맞게 변환
+        return feedbacks.map(feedback => ({
+            post_id: feedback.post_id,
+            post_title: feedback.post_title,
+            user_id: feedback.user_id,
+            nickname: feedback.nickname,
+            post_date: feedback.post_date,
+            feedback_date: feedback.feedback_date,
+            language: feedback.language
+        }));
+    } catch (error) {
+        console.error("사용자 피드백을 가져오는 중 에러 발생:", error);
+        throw error;
+    }
 }
 
 
