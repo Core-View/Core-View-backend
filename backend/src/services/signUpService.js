@@ -42,4 +42,21 @@ const create_code = async() => {
   return n.toString().padStart(6, "0");
 };
 
-module.exports = { signUp,create_code };
+const emailCheck = async(email, res) => {
+
+  let sql = `select user_id from user where user_email = ?`;
+
+  try{
+    let [result] = await pool.query(sql, [email]);
+
+    if(result.length === 0){
+      return true;
+    } else{
+      return false;
+    }
+  }catch(error){
+    console.log(error);
+    res.status(500).send({success: false});
+  }
+}
+module.exports = { signUp,create_code ,emailCheck};

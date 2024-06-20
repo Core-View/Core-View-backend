@@ -21,22 +21,29 @@ const signUp = async (req, res) => {
 };
 
 const auth = async (req, res) => {
-  const email = req.body.email;
+  const email = req.body.user_email;
   code = await signUpService.create_code();
 
   try {
+    let check = await signUpService.emailCheck(email, res);
+
+    if(!check){
+      
+      res.status(400).send({success: false, message: "이미 가입된 이메일이 있습니다."});
+      return;
+    }
     await mailer.sendMail(
       email,
       "<Core-view> 이메일 인증코드입니다",
-      `<p>이메일 인증코드입니다. ${code}를 입력해주세요</p>`
+      `<p>이메일 인증코드입니다. ${code}를 입력해주세요</p>`, res
     );
 
     req.session[email] = code;
 
-    res.status(200).send({ success: true});
+    // res.status(200).send({ success: true});
   } catch (error) {
     console.error("Error in auth controller:", error);
-    res.status(500).json({ message: "서버 에러가 발생했습니다." });
+    // res.status(500).json({ message: "서버 에러가 발생했습니다." });
   }
 };
 

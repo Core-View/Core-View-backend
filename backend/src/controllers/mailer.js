@@ -41,6 +41,7 @@ const sendMail = async (to, subject, html,res) => {
     await googleTransporter.sendMail(mailOptions);
     googleTransporter.close();
     console.log(`mail have sent to ${to}`);
+    res.status(200).send({success: true});
   } catch (err) {
     res.status(500).send({success: false, message: "잠시후 다시 시도해주세요"})
     console.log(err);
