@@ -122,22 +122,25 @@ async modifyUserImage(user_id, imageFileName) {
     try {
       const connection = await pool.getConnection();
 
-      const [result] = await connection.query(
+      // 사용자 삭제
+      const [deleteUserResult] = await connection.query(
         "DELETE FROM user WHERE user_id = ?", 
         [user_id]
       );
-
+  
       connection.release();
-
-      if (result.affectedRows === 0) {
+  
+      if (deleteUserResult.affectedRows === 0) {
         throw new Error("사용자를 찾을 수 없음");
       }
 
+      return { message: "사용자 및 사용자의 모든 게시물이 성공적으로 삭제되었습니다.", access: true };
     } catch (error) {
       console.error("사용자 삭제 중 에러 발생:", error);
       throw error;
     }
   }
+  
 
   async getUserPosts(user_id) {
     try {
