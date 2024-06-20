@@ -9,8 +9,22 @@ class UserService {
     try {
       const connection = await pool.getConnection();
   
+      // 사용자가 받은 좋아요 수를 계산하는 쿼리
+      const [likesReceivedRows] = await connection.query(
+        "SELECT COUNT(*) AS likes_received " +
+        "FROM post " +
+        "JOIN post_likes ON post.post_id = post_likes.post_id " +
+        "WHERE post.user_id = ?",
+        [user_id]
+      );
+  
+      // 사용자 정보와 게시물 정보를 가져오는 쿼리
       const [userRows] = await connection.query(
-        "SELECT user_id, user_nickname AS nickname, user_email AS email, user_password AS password, user_image AS profile_picture, user_intro AS introduction FROM user WHERE user_id = ?", 
+        "SELECT u.user_id, u.user_nickname AS nickname, u.user_email AS email, u.user_password AS password, u.user_image AS profile_picture, u.user_intro AS introduction, u.user_contribute AS contribute, " +
+        "p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language " +
+        "FROM user u " +
+        "LEFT JOIN post p ON u.user_id = p.user_id " +
+        "WHERE u.user_id = ?",
         [user_id]
       );
   
@@ -22,18 +36,33 @@ class UserService {
         throw new Error("사용자를 찾을 수 없음");
       }
   
-      return {
+      const userInfo = {
         user_id: userRows[0].user_id,
         email: userRows[0].email,
         nickname: userRows[0].nickname,
-        profile_picture: `/images/${userRows[0].profile_picture}`, // 이미지 경로 생성
+        profile_picture: `${userRows[0].profile_picture}`, // 이미지 경로 생성
         introduction: userRows[0].introduction,
+        contribute: userRows[0].contribute,
+        likes_received: likesReceivedRows[0].likes_received, // 사용자가 받은 좋아요 수
+        posts: userRows.map(row => ({
+          post_id: row.post_id,
+          post_title: row.post_title,
+          post_content: row.post_content,
+          post_code: row.post_code,
+          post_date: row.post_date,
+          language: row.language
+        }))
       };
+  
+      return userInfo;
     } catch (error) {
       console.error("사용자 정보를 가져오는 중 에러 발생:", error);
       throw error;
     }
   }
+  
+  
+  
   
   async modifyUserInfo(user_id, user_nickname, user_password, user_intro) {
     try {
@@ -93,7 +122,7 @@ async modifyUserImage(user_id, imageFileName) {
         }
 
         // 새로운 이미지 파일 경로 설정
-        const newImagePath = imageFileName ? `/images/${imageFileName}` : null;
+        const newImagePath = imageFileName ? `${imageFileName}` : null;
 
         // MySQL에 경로를 포함하여 이미지 파일명을 저장하는 쿼리
         const [result] = await connection.query(
@@ -121,13 +150,7 @@ async modifyUserImage(user_id, imageFileName) {
   async deleteUserById(user_id) {
     try {
       const connection = await pool.getConnection();
-  
-      // 사용자가 작성한 모든 게시물을 삭제하는 쿼리
-      const [deletePostsResult] = await connection.query(
-        "DELETE FROM post WHERE user_id = ?", 
-        [user_id]
-      );
-  
+
       // 사용자 삭제
       const [deleteUserResult] = await connection.query(
         "DELETE FROM user WHERE user_id = ?", 
@@ -139,9 +162,7 @@ async modifyUserImage(user_id, imageFileName) {
       if (deleteUserResult.affectedRows === 0) {
         throw new Error("사용자를 찾을 수 없음");
       }
-  
-      console.log("사용자 및 사용자의 모든 게시물 삭제 완료");
-  
+
       return { message: "사용자 및 사용자의 모든 게시물이 성공적으로 삭제되었습니다.", access: true };
     } catch (error) {
       console.error("사용자 삭제 중 에러 발생:", error);

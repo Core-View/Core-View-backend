@@ -18,6 +18,7 @@ const passwordRouter = require('./passwordRouter');
 const feedbackRouter = require('./feedbackRouter');
 const noticeRouter = require("./noticeRouter");
 const alarmRouter = require('./alarmRouter');
+const adminRouter = require('./adminRouter');
 // const homeRouter = require('./homeRouter'); // 홈 페이지 라우터 추가(소셜계정 테스트용, 삭제 하셔도 됩니다)
 
 // 환경 변수 설정
@@ -52,7 +53,7 @@ app.use("/logout", logoutRouter);
 app.use('/api', virtualCompilerRouter);
 app.use("/mypage", mypageRouter);
 app.use('/', profileRouter);
-
+app.use('/admin', adminRouter);
 app.use("/post", postRouter); 
 app.use("/", top3PostsRouter); 
 app.use("/", top3FeedbackRouter);
@@ -61,8 +62,6 @@ app.use('/notice', noticeRouter);
 app.use('/sse/streaming', alarmRouter);
 app.use('/password', passwordRouter);
 // app.use('/', homeRouter); // 홈 페이지 라우터 사용(구글 소셜로그인 테스트용 삭제 해주셔도 됩니다)
-
-console.log('MAIL_REFRESH:', process.env.MAIL_REFRESH);
 
 app.use('/api', feedbackRouter);
 
