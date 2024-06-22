@@ -29,6 +29,7 @@ const authenticate = async (user_email, inputPassword) => {
     return {
       success: true,
       user_id: user.user_id,
+      role : user.role
       // 필요한 경우 추가 정보 반환
     };
   } catch (err) {

@@ -1,7 +1,7 @@
 const userService = require('../services/mypageService');
 const { hashedPassword } = require("../utils/cryptoUtils");
 const crypto = require('crypto');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const bcrypt = require('bcrypt');
 
@@ -83,6 +83,7 @@ class UserController {
       res.status(500).json({ message: "사용자 이미지 수정 중 에러 발생" });
     }
   }
+
 
   async deleteUser(req, res) {
     const user_id = req.params.user_id;
