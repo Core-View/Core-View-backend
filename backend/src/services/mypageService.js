@@ -25,8 +25,7 @@ class UserService {
             "WHERE u.user_id = ?",
             [user_id]
         );
-  
-        console.log("사용자 정보 조회 완료:", userRows);
+
   
         connection.release();
   
@@ -57,8 +56,6 @@ async getLikedPosts(user_id) {
   try {
       const connection = await pool.getConnection();
 
-      console.log(`사용자 ID: ${user_id} - 좋아요 누른 게시물 가져오기 시작`);
-
       // 사용자가 좋아요를 누른 게시물을 가져오는 쿼리
       const [likedPostsRows] = await connection.query(
           `SELECT p.post_id, p.post_title, p.post_date, p.language, u.user_id as post_user_id, u.user_nickname as user_nickname
@@ -70,8 +67,6 @@ async getLikedPosts(user_id) {
       );
 
       connection.release();
-
-      console.log(`좋아요 누른 게시물 수: ${likedPostsRows.length}`);
       
       // 좋아요를 누른 게시물 정보를 반환
       return likedPostsRows.map(row => ({
@@ -108,8 +103,6 @@ async getLikedPosts(user_id) {
             [user_nickname, hashedPassword, user_intro, user_salt, user_id]
         );
 
-        console.log("사용자 정보 수정 완료:", result);
-
         connection.release();
 
         if (result.affectedRows === 0) {
@@ -143,7 +136,6 @@ async modifyUserImage(user_id, imageFileName) {
             // 파일 삭제
             try {
                 await fs.unlink(previousImagePath);
-                console.log(`이전 이미지 파일 삭제 완료: ${previousImagePath}`);
             } catch (error) {
                 console.error(`이전 이미지 파일 삭제 중 에러 발생: ${previousImagePath}`, error);
             }
@@ -157,8 +149,6 @@ async modifyUserImage(user_id, imageFileName) {
             "UPDATE user SET user_image = ? WHERE user_id = ?", 
             [newImagePath, user_id]
         );
-
-        console.log("사용자 이미지 수정 완료:", result);
 
         connection.release();
 
@@ -211,8 +201,6 @@ async getUserPosts(user_id) {
             [user_id]
         );
 
-        console.log("사용자 게시물 조회 완료:", posts);
-
         connection.release();
 
         if (posts.length === 0) {
@@ -248,8 +236,6 @@ async getUserFeedback(user_id) {
              WHERE f.user_id = ?`,
             [user_id]
         );
-
-        console.log("사용자 피드백 조회 완료:", feedbacks);
 
         connection.release();
 

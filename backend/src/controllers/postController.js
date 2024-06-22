@@ -33,14 +33,12 @@ exports.likePost = async (req, res) => {
       return res.status(400).json({ error: '본인의 포스트는 좋아요 할 수 없습니다.' });
     }
 
-    console.log('중복 체크 쿼리 실행 중:', checkDuplicateQuery);
     const [existingLikes] = await pool.query(checkDuplicateQuery, [post_id, user_id]);
 
     if (existingLikes.length > 0) {
       return res.status(400).json({ error: '이미 이 포스트를 좋아요 했습니다.' });
     }
 
-    console.log('좋아요 추가 쿼리 실행 중:', insertLikeQuery);
     await pool.query(insertLikeQuery, [post_id, user_id]);
     res.status(201).json({ message: '포스트가 성공적으로 좋아요 되었습니다.' });
   } catch (err) {
@@ -62,7 +60,7 @@ exports.unlikePost = async (req, res) => {
   `;
 
   try {
-    console.log('쿼리 실행 중:', sqlQuery);
+  
     await pool.query(sqlQuery, [post_id, user_id]);
     res.status(200).json({ message: '포스트 좋아요가 성공적으로 취소되었습니다.' });
   } catch (err) {
@@ -106,7 +104,7 @@ exports.getPostsByDate = async (req, res) => {
   `;
 
   try {
-    console.log('쿼리 실행 중:', sqlQuery);
+   
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
@@ -137,7 +135,7 @@ exports.getPostsByLikes = async (req, res) => {
   `;
 
   try {
-    console.log('쿼리 실행 중:', sqlQuery);
+ 
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
@@ -166,7 +164,7 @@ exports.getRecent3Posts = async (req, res) => {
   `;
 
   try {
-    console.log('쿼리 실행 중:', sqlQuery);
+   
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
@@ -186,8 +184,7 @@ exports.getUserContribution = async (req, res) => {
   `;
 
   try {
-    console.log('쿼리 실행 중: 사용자 기여도');
-    
+
     const [[userContributionResult]] = await pool.query(userContributionQuery, [user_id]);
 
     if (!userContributionResult) {
@@ -216,7 +213,6 @@ exports.getTop3Contributors = async (req, res) => {
   `;
 
   try {
-    console.log('쿼리 실행 중:', sqlQuery);
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
@@ -260,7 +256,6 @@ exports.getPostDetails = async (req, res) => {
   `;
 
   try {
-    console.log('쿼리 실행 중:', sqlQuery);
     const [results] = await pool.query(sqlQuery, [post_id]);
 
     if (results.length === 0) {
