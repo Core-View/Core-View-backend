@@ -133,7 +133,7 @@ class UserController {
 
     const before_image_path = req.body.preimage;
 
-    if(!before_image_path){
+    if(before_image_path == 'null' || before_image_path === ''){
       res.status(200).send({access: true});
       return;
     }else{
