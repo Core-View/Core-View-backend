@@ -58,6 +58,18 @@ exports.getFeedbacksByPostId = async (req, res) => {
   }
 };
 
+// 사용자가 특정 포스트의 피드백에 좋아요를 눌렀는지 확인
+exports.getLikedFeedbacksByPostAndUser = async (req, res) => {
+  const { post_id, user_id } = req.params;
+  try {
+    const likedFeedbacks = await feedbackService.getLikedFeedbacksByPostAndUser(post_id, user_id);
+    res.json(likedFeedbacks);
+  } catch (error) {
+    console.error('Error in getLikedFeedbacksByPostAndUser:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 // ID로 특정 피드백 조회
 exports.getFeedbackById = async (req, res) => {
   const id = req.params.id;

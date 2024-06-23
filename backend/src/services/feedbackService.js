@@ -64,6 +64,23 @@ exports.getFeedbacksByPostId = async (post_id) => {
   }
 };
 
+// 사용자가 특정 포스트의 피드백에 좋아요를 눌렀는지 확인
+exports.getLikedFeedbacksByPostAndUser = async (post_id, user_id) => {
+  const query = `
+    SELECT f.feedback_id
+    FROM feedback_likes fl
+    JOIN feedback f ON fl.feedback_id = f.feedback_id
+    WHERE f.post_id = ? AND fl.user_id = ?
+  `;
+  try {
+    const [rows] = await pool.query(query, [post_id, user_id]);
+    return rows.map(row => row.feedback_id);
+  } catch (error) {
+    console.error('Error in getLikedFeedbacksByPostAndUser:', error);
+    throw error;
+  }
+};
+
 // 피드백 수정
 exports.updateFeedback = async (id, data) => {
   const { post_id, user_id, feedback_date, feedback_comment, feedback_codenumber } = data;

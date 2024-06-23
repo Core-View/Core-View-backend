@@ -13,4 +13,6 @@ router.delete('/feedbacks/:id', authMiddleware.authenticateSession, feedbackCont
 router.post('/feedbacklikes', authMiddleware.authenticateSession, feedbackController.createFeedbackLike);
 router.delete('/feedbacklikes/:id', authMiddleware.authenticateSession, feedbackController.deleteFeedbackLike);
 
+router.get('/feedbacklikes/:post_id/:user_id', feedbackController.getLikedFeedbacksByPostAndUser);
+
 module.exports = router;
