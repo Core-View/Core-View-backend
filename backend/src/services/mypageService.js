@@ -49,7 +49,6 @@ class UserService {
         throw error;
     }
 }
-
   
   
 async getLikedPosts(user_id) {
@@ -83,10 +82,6 @@ async getLikedPosts(user_id) {
       throw error;
   }
 }
-
-
-
-
   
   async modifyUserInfo(user_id, user_nickname, user_password, user_intro) {
     try {
@@ -183,10 +178,6 @@ async getUserPosts(user_id) {
 
         connection.release();
 
-        if (posts.length === 0) {
-            throw new Error("게시물을 찾을 수 없음");
-        }
-
         return posts.map(post => ({
             post_id: post.post_id,
             post_title: post.post_title,
@@ -220,10 +211,6 @@ async getUserFeedback(user_id) {
 
         connection.release();
 
-        if (feedbacks.length === 0) {
-            throw new Error("피드백을 찾을 수 없음");
-        }
-
         // 피드백 정보를 반환 형식에 맞게 변환
         return feedbacks.map(feedback => ({
             post_id: feedback.post_id,
@@ -240,8 +227,6 @@ async getUserFeedback(user_id) {
         throw error;
     }
 }
-
-
 
 }
 
