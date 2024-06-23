@@ -121,27 +121,6 @@ async modifyUserImage(user_id, imageFileName) {
     try {
         const connection = await pool.getConnection();
 
-        // 이전 이미지 경로 가져오기
-        const [previousImageRows] = await connection.query(
-            "SELECT user_image FROM user WHERE user_id = ?", 
-            [user_id]
-        );
-
-        const previous_image_path = previousImageRows[0]?.user_image;
-
-        // 기존 이미지가 존재하면 삭제
-        if (previous_image_path) {
-            // 이미지 파일 경로 생성
-            const previousImagePath = path.join(__dirname, '../../../../front/front/public/images/', previous_image_path);
-
-            // 파일 삭제
-            try {
-                await fs.unlink(previousImagePath);
-            } catch (error) {
-                console.error(`이전 이미지 파일 삭제 중 에러 발생: ${previousImagePath}`, error);
-            }
-        }
-
         // 새로운 이미지 파일 경로 설정
         const newImagePath = imageFileName ? `images/${imageFileName}` : null;
 
@@ -158,7 +137,7 @@ async modifyUserImage(user_id, imageFileName) {
         }
 
         // 수정된 이미지 경로와 이전 이미지 경로 반환
-        return { message: "사용자 이미지가 성공적으로 수정되었습니다.", access: true, previous_image_path };
+        return { message: "사용자 이미지가 성공적으로 수정되었습니다.", access: true};
     } catch (error) {
         console.error("사용자 이미지 수정 중 에러 발생:", error);
         throw error;

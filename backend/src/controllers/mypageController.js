@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const fs = require('fs').promises;
 const path = require('path');
 const bcrypt = require('bcrypt');
+const { access } = require('fs');
 
 class UserController {
   async getUser(req, res) {
@@ -43,6 +44,7 @@ class UserController {
     }
   
     try {
+     
   
       // Modify user info without image
       const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
@@ -56,19 +58,17 @@ class UserController {
     }
   }
   
-
   async modifyUserImage(req, res) {
     const user_id = req.params.user_id;
   
     try {
-  
       let imageFileName = null;
       if (req.file && req.file.buffer) {
         const fileName = `${user_id}_${Date.now()}.png`;
         const filePath = path.join(__dirname, '../../../../front/front/front/public/images/', fileName);
-
+  
         // 이미지를 파일로 저장
-        await fs.promises.writeFile(filePath, req.file.buffer);
+        await fs.writeFile(filePath, req.file.buffer);
   
         imageFileName = fileName;
       }
@@ -83,8 +83,7 @@ class UserController {
       res.status(500).json({ message: "사용자 이미지 수정 중 에러 발생" });
     }
   }
-
-
+  
   async deleteUser(req, res) {
     const user_id = req.params.user_id;
 
@@ -136,7 +135,7 @@ class UserController {
     
     fs.promises.unlink(image_path);
 
-    res.status(200).send({success: true})
+    res.status(200).send({access: true})
 
   }
 }
