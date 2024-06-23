@@ -1,29 +1,35 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
 
 const tempDir = os.tmpdir();
 
 // C 코드 실행 함수
 function runCCode(code) {
     return new Promise((resolve, reject) => {
-        const outputFilePath = path.join(tempDir, 'c_program.exe');
-        const compiler = spawn('gcc', ['-o', outputFilePath, '-xc', '-']);
+        const sourceFilePath = path.join(tempDir, 'program.c');
+        const outputFilePath = path.join(tempDir, 'program.exe');
         
-        compiler.stdin.write(code);
-        compiler.stdin.end();
+        fs.writeFileSync(sourceFilePath, code);
 
+        const compiler = spawn('gcc', [sourceFilePath, '-o', outputFilePath]);
+        
         compiler.on('close', (code) => {
             if (code === 0) {
-                const c_program = spawn(outputFilePath);
+                const program = spawn(outputFilePath);
                 let result = '';
 
-                c_program.stdout.on('data', (data) => {
-                    result += data.toString() + '\n'; // 줄별로 구분하여 추가
+                program.stdout.on('data', (data) => {
+                    result += data.toString();
                 });
 
-                c_program.on('close', () => {
-                    resolve(result);
+                program.on('close', () => {
+                    resolve({ output: result });
+                });
+
+                program.stderr.on('data', (data) => {
+                    reject(data.toString());
                 });
             } else {
                 reject('Compilation failed');
@@ -39,23 +45,28 @@ function runCCode(code) {
 // C++ 코드 실행 함수
 function runCppCode(code) {
     return new Promise((resolve, reject) => {
-        const outputFilePath = path.join(tempDir, 'cpp_program.exe');
-        const compiler = spawn('g++', ['-o', outputFilePath, '-x', 'c++', '-']);
+        const sourceFilePath = path.join(tempDir, 'program.cpp');
+        const outputFilePath = path.join(tempDir, 'program.exe');
         
-        compiler.stdin.write(code);
-        compiler.stdin.end();
+        fs.writeFileSync(sourceFilePath, code);
 
+        const compiler = spawn('g++', [sourceFilePath, '-o', outputFilePath]);
+        
         compiler.on('close', (code) => {
             if (code === 0) {
-                const cpp_program = spawn(outputFilePath);
+                const program = spawn(outputFilePath);
                 let result = '';
 
-                cpp_program.stdout.on('data', (data) => {
-                    result += data.toString() + '\n'; // 줄별로 구분하여 추가
+                program.stdout.on('data', (data) => {
+                    result += data.toString();
                 });
 
-                cpp_program.on('close', () => {
-                    resolve(result);
+                program.on('close', () => {
+                    resolve({ output: result });
+                });
+
+                program.stderr.on('data', (data) => {
+                    reject(data.toString());
                 });
             } else {
                 reject('Compilation failed');
@@ -74,21 +85,25 @@ function runJavaCode(code) {
         const javaFilePath = path.join(tempDir, 'Main.java');
         const outputDir = tempDir;
 
-        require('fs').writeFileSync(javaFilePath, code);
+        fs.writeFileSync(javaFilePath, code);
 
         const compiler = spawn('javac', ['-d', outputDir, javaFilePath]);
 
         compiler.on('close', (code) => {
             if (code === 0) {
-                const java_program = spawn('java', ['-classpath', outputDir, 'Main']);
+                const program = spawn('java', ['-classpath', outputDir, 'Main']);
                 let result = '';
 
-                java_program.stdout.on('data', (data) => {
-                    result += data.toString() + '\n'; // 줄별로 구분하여 추가
+                program.stdout.on('data', (data) => {
+                    result += data.toString();
                 });
 
-                java_program.on('close', () => {
-                    resolve(result);
+                program.on('close', () => {
+                    resolve({ output: result });
+                });
+
+                program.stderr.on('data', (data) => {
+                    reject(data.toString());
                 });
             } else {
                 reject('Compilation failed');
@@ -104,18 +119,18 @@ function runJavaCode(code) {
 // Python 코드 실행 함수
 function runPythonCode(code) {
     return new Promise((resolve, reject) => {
-        const python_program = spawn('python3', ['-c', code]);
+        const pythonProgram = spawn('python3', ['-c', code]);
         let result = '';
 
-        python_program.stdout.on('data', (data) => {
-            result += data.toString() + '\n'; // 줄별로 구분하여 추가
+        pythonProgram.stdout.on('data', (data) => {
+            result += data.toString();
         });
 
-        python_program.on('close', () => {
-            resolve(result);
+        pythonProgram.on('close', () => {
+            resolve({ output: result });
         });
 
-        python_program.stderr.on('data', (data) => {
+        pythonProgram.stderr.on('data', (data) => {
             reject(data.toString());
         });
     });
