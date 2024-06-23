@@ -39,7 +39,7 @@ const sendMail = async (to, subject, html,res) => {
     };
     //adsßgit add
   try {
-    await googleTransporter.sendMail(mailOptions);
+    await googleTransporter.sendMail(mailOptions);  
     googleTransporter.close();
     console.log(`mail have sent to ${to}`);
     res.status(200).send({success: true});

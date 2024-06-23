@@ -32,15 +32,33 @@ async function compileCode(req, res) {
         output = result.output;
         break;
       default:
-        result = 'Code not compiled';
-        language = 'other'; // 컴파일 없이 저장되는 메시지와 언어 설정
+        let errorMessage = ''; // 원하는 문구 result에 저장
+        let otherLanguage = 'other'; // 컴파일 없이 저장되 언어 설정
+        
+          // MySQL에 데이터 삽입
+        const connection = await pool.getConnection();
+        const [insertResults, fields] = await connection.execute(
+          'INSERT INTO coreview.post (post_title, post_code, post_result, post_content, post_date, user_id, language) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
+          [title, code, errorMessage, content, user_id, otherLanguage]
+        );
+        postId = insertResults.insertId; // postId를 설정합니다.
+        connection.release();
+
+        res.send({
+          postId,
+          title,
+          code,
+          result: errorMessage,
+          message: 'Post created successfully',
+        });
+        return; // switch 문을 빠져나갑니다.
     }
 
     // MySQL에 데이터 삽입
     const connection = await pool.getConnection();
     const [insertResults, fields] = await connection.execute(
       'INSERT INTO coreview.post (post_title, post_code, post_result, post_content, post_date, user_id, language) VALUES (?, ?, ?, ?, NOW(), ?, ?)',
-      [title, code, result, content, user_id, language]
+      [title, code, result.output, content, user_id, language]
     );
     postId = insertResults.insertId; // postId를 설정합니다.
     connection.release();
@@ -49,12 +67,12 @@ async function compileCode(req, res) {
       postId,
       title,
       code,
-      result,
+      result: result.output,
       message: 'Post created successfully',
     });
   } catch (error) {
     // 만약 컴파일 에러가 발생하면 여기서 처리
-    const errorMessage = error.result || error.toString();
+    const errorMessage = error.output || error.toString();
 
     try {
       // MySQL에 에러 메시지를 저장
