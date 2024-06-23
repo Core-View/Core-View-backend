@@ -101,7 +101,8 @@ exports.getPostsByDate = async (req, res) => {
     FROM post p
     LEFT JOIN user u ON p.user_id = u.user_id
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname,u.user_contribute
+    WHERE u.role = 0
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname, u.user_contribute
     ORDER BY p.post_date DESC
   `;
 
@@ -114,8 +115,6 @@ exports.getPostsByDate = async (req, res) => {
     res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
-
-
 
 // 좋아요가 많은 순으로 포스트를 정렬하는 함수
 exports.getPostsByLikes = async (req, res) => {
@@ -132,7 +131,8 @@ exports.getPostsByLikes = async (req, res) => {
     FROM post p 
     LEFT JOIN user u ON p.user_id = u.user_id 
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id 
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname,u.user_contribute
+    WHERE u.role = 0
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_nickname, u.user_contribute
     ORDER BY total_likes DESC
   `;
 
@@ -156,11 +156,13 @@ exports.getRecent3Posts = async (req, res) => {
       p.language, 
       p.user_id,
       u.user_contribute,
+      u.user_nickname,
       COUNT(pl.post_id) AS total_likes
     FROM post p
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
-    LEFT JOIN user u ON p.user_id = u.user_id 
-    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id,u.user_contribute
+    LEFT JOIN user u ON p.user_id = u.user_id
+    WHERE u.role = 0 
+    GROUP BY p.post_id, p.post_title, p.post_date, p.language, p.user_id, u.user_contribute, u.user_nickname
     ORDER BY p.post_date DESC
     LIMIT 3
   `;
@@ -175,14 +177,14 @@ exports.getRecent3Posts = async (req, res) => {
   }
 };
 
-// 사용자 기여도를 가져오는 함수
+// 사용자 개인의 기여도를 가져오는 함수
 exports.getUserContribution = async (req, res) => {
   const { user_id } = req.body; // 요청 본문에서 user_id 가져오기
 
   const userContributionQuery = `
     SELECT user_contribute
     FROM user
-    WHERE user_id = ?
+    WHERE user_id = ? AND role = 0
   `;
 
   try {
@@ -204,15 +206,43 @@ exports.getUserContribution = async (req, res) => {
   }
 };
 
-// 기여도가 높은 상위 3명의 사용자를 가져오는 함수
+// 사용자 기여도 top3를 가져오는 함수
 exports.getTop3Contributors = async (req, res) => {
   const sqlQuery = `
     SELECT 
       user_id, 
-      user_contribute
-    FROM user
-    ORDER BY user_contribute DESC
-    LIMIT 3
+      user_contribute,
+      user_nickname,
+      user_image,
+      user_intro
+  FROM user
+  WHERE role = 0
+  ORDER BY user_contribute DESC
+  LIMIT 3;
+  `;
+
+  try {
+    console.log('쿼리 실행 중:', sqlQuery);
+    const [results] = await pool.query(sqlQuery);
+    res.json(results);
+  } catch (err) {
+    console.error('데이터베이스 오류:', err);
+    res.status(500).json({ error: '데이터베이스 오류' });
+  }
+};
+
+// 사용자 전체의 기여도를 가져오는 함수
+exports.getContributors = async (req, res) => {
+  const sqlQuery = `
+    SELECT 
+      user_id, 
+      user_contribute,
+      user_nickname,
+      user_image,
+      user_intro
+  FROM user
+  WHERE role = 0
+  ORDER BY user_contribute DESC
   `;
 
   try {
@@ -255,8 +285,8 @@ exports.getPostDetails = async (req, res) => {
     FROM post p
     LEFT JOIN user u ON p.user_id = u.user_id
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
-    WHERE p.post_id = ?
-    GROUP BY p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language, p.user_id, p.post_result, u.user_nickname,u.user_contribute
+    WHERE p.post_id = ? AND u.role = 0
+    GROUP BY p.post_id, p.post_title, p.post_content, p.post_code, p.post_date, p.language, p.user_id, p.post_result, u.user_nickname, u.user_image, u.user_contribute
   `;
 
   try {
@@ -271,4 +301,8 @@ exports.getPostDetails = async (req, res) => {
   } catch (err) {
     console.error('데이터베이스 오류:', err);
     res.status(500).json({ error: '데이터베이스 오류' });
-  }};
+  }
+};
+
+
+

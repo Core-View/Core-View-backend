@@ -32,7 +32,8 @@ async function compileCode(req, res) {
         output = result.output;
         break;
       default:
-        return res.status(400).send('Unsupported language');
+        result = 'Code not compiled';
+        language = 'other'; // 컴파일 없이 저장되는 메시지와 언어 설정
     }
 
     // MySQL에 데이터 삽입

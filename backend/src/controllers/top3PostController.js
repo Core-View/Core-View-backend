@@ -8,12 +8,12 @@ exports.getTop3Posts = async (req, res) => {
   const twoWeeksAgoFormatted = twoWeeksAgo.toISOString().split('T')[0];
 
   const sqlQuery = `
-    SELECT p.*, u.user_contribute, COUNT(pl.post_id) AS total_likes 
+    SELECT p.*, u.user_contribute, u.user_nickname, COUNT(pl.post_id) AS total_likes 
     FROM post p
     LEFT JOIN post_likes pl ON p.post_id = pl.post_id
     LEFT JOIN user u ON p.user_id = u.user_id
-    WHERE p.post_date >= ?
-    GROUP BY p.post_id, u.user_contribute
+    WHERE p.post_date >= ? AND u.role = 0
+    GROUP BY p.post_id, u.user_contribute, u.user_nickname
     ORDER BY total_likes DESC
     LIMIT 3;
   `;
@@ -27,5 +27,6 @@ exports.getTop3Posts = async (req, res) => {
     res.status(500).json({ error: 'Database error' });
   }
 };
+
 
 
