@@ -13,7 +13,7 @@ const generateRandomCode = () => {
 };
 
 const forgotPassword = async (req, res) => {
-    const { user_email } = req.body;
+    const { user_email } = req.body;    
 
     try {
         const [user] = await pool.query('SELECT * FROM user WHERE user_email = ?', [user_email]);
@@ -30,22 +30,26 @@ const forgotPassword = async (req, res) => {
             <p>인증 코드를 입력하여 비밀번호를 재설정하세요.</p>
         `;
 
-        await sendMail(user_email, "<Core-view> 비밀번호 재설정 코드", html), res;
+        req.session[user_email] = resetCode;
 
-        // return res.status(200).json({ success: true, message: "이메일로 인증 코드가 전송되었습니다." });
+        await sendMail(user_email, "<Core-view> 비밀번호 재설정 코드", html, res);
+
+        return res.status(200).json({ success: true, message: "이메일로 인증 코드가 전송되었습니다." });
     } catch (error) {
         console.error("비밀번호 재설정 오류:", error);
-        // return res.status(500).json({ success: false, message: "서버 에러가 발생했습니다." });
+        return res.status(500).json({ success: false, message: "서버 에러가 발생했습니다." });
     }
 };
 
 const emailCheck = (req, res) => {
-    const { authcode } = req.body;
-
-    if (parseInt(authcode) !== parseInt(resetCode)) {
-        return res.status(400).json({ success: false, message: "인증 코드가 올바르지 않습니다." });
+    const user_code = req.body.authcode;
+    const email = req.body.email;
+  
+    if (req.session[email] != user_code) {
+      res.status(200).send({ success: false, message: "인증번호가 일치하지 않습니다." });
     } else {
-        return res.status(200).json({ success: true, message: "인증번호가 일치합니다." });
+      delete req.session[email];
+      res.status(200).send({ success: true, message: "인증번호가 일치합니다." });
     }
 };
 
