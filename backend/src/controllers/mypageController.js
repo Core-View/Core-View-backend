@@ -131,9 +131,9 @@ class UserController {
 
   async DeleteUserImage(req, res) {
     const before_image_path = req.body.preimage;
-    const image_path = path.join(__dirname,'../../../../front/front/front/public/', `${before_image_path})`);
+    const image_path = path.join(__dirname,'../../../../front/front/front/public/', `${before_image_path}`);
     
-    fs.promises.unlink(image_path);
+    await fs.unlink(image_path);
 
     res.status(200).send({access: true})
 
