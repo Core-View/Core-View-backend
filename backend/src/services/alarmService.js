@@ -6,7 +6,7 @@ const getAlarm = async (user_id) => {
     FROM  alarm n
     JOIN feedback f ON n.feedback_id = f.feedback_id
     JOIN post p ON f.post_id = p.post_id
-    WHERE n.user_id = ? and (n.alarm_check = 0 || DATEDIFF(now(), n.alarm_date) <= 3)
+    WHERE n.user_id = ? and (n.alarm_check = 0 or DATEDIFF(now(), n.alarm_date) <= 3)
     ORDER BY n.alarm_date DESC`;
 
     try{
