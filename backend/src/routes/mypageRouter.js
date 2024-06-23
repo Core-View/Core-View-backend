@@ -16,6 +16,9 @@ router.put('/:user_id/modify', userController.modifyUser.bind(userController));
 // 사용자 이미지 수정 (POST 방식으로 이미지 추가 및 변경)
 router.post('/:user_id/modifyImage', upload.single('user_image'), userController.modifyUserImage.bind(userController));
 
+//사용자 이미지 삭제
+router.post('/:user_id/deleteImage', userController.DeleteUserImage.bind(userController));
+
 // 사용자 삭제
 router.delete('/:user_id/delete', userController.deleteUser.bind(userController));
 
