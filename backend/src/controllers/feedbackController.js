@@ -17,7 +17,7 @@ exports.createFeedback = async (req, res) => {
     // 현재 날짜와 시간을 가져오기
     const feedbackDate = new Date();
     const formattedDate = feedbackDate.toISOString().slice(0, 19).replace('T', ' ');
-
+    
     // 피드백 생성
     const feedbackQuery = 'INSERT INTO feedback (post_id, user_id, user_nickname, feedback_date, feedback_comment, feedback_codenumber) VALUES (?, ?, ?, ?, ?, ?)';
     const [feedbackResult] = await pool.query(feedbackQuery, [post_id, user_id, user_nickname, formattedDate, feedback_comment, feedback_codenumber]);

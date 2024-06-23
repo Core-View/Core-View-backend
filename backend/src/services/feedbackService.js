@@ -158,7 +158,7 @@ exports.deleteFeedbackLike = async (id) => {
     END
     WHERE user_id = ?`;
 
-    console.log("dfdf",feedback_user_id);
+    
 
     await pool.query(sql, [feedback_user_id[0].user_id]);
     return result;

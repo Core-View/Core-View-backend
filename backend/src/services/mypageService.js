@@ -58,11 +58,11 @@ async getLikedPosts(user_id) {
 
       // 사용자가 좋아요를 누른 게시물을 가져오는 쿼리
       const [likedPostsRows] = await connection.query(
-          `SELECT p.post_id, p.post_title, p.post_date, p.language, u.user_id as post_user_id, u.user_nickname as user_nickname
+          `SELECT p.post_id, p.post_title, p.post_date, p.language, u.user_id as post_user_id, u.user_nickname as user_nickname,u.user_image as profile_picture
            FROM post_likes pl 
            JOIN post p ON pl.post_id = p.post_id 
            JOIN user u ON p.user_id = u.user_id
-           WHERE pl.user_id = ?`,
+           WHERE pl.user_id = ? order by p.post_date DESC`,
           [user_id]
       );
 
@@ -75,7 +75,8 @@ async getLikedPosts(user_id) {
           post_date: row.post_date,
           language: row.language,
           user_id: row.post_user_id,
-          user_nickname: row.user_nickname
+          user_nickname: row.user_nickname,
+          profile_picture: `${row.profile_picture}`
       }));
   } catch (error) {
       console.error("좋아요를 누른 게시물을 가져오는 중 에러 발생:", error);
@@ -142,7 +143,7 @@ async modifyUserImage(user_id, imageFileName) {
         }
 
         // 새로운 이미지 파일 경로 설정
-        const newImagePath = imageFileName ? `${imageFileName}` : null;
+        const newImagePath = imageFileName ? `images/${imageFileName}` : null;
 
         // MySQL에 경로를 포함하여 이미지 파일명을 저장하는 쿼리
         const [result] = await connection.query(
@@ -194,10 +195,10 @@ async getUserPosts(user_id) {
         const connection = await pool.getConnection();
 
         const [posts] = await connection.query(
-            `SELECT p.post_id, p.post_title, p.language, p.post_date, u.user_id, u.user_nickname
+            `SELECT p.post_id, p.post_title, p.language, p.post_date, u.user_id, u.user_nickname,u.user_image AS profile_picture
              FROM post p
              JOIN user u ON p.user_id = u.user_id
-             WHERE p.user_id = ?`,
+             WHERE p.user_id = ? order by p.post_date DESC`,
             [user_id]
         );
 
@@ -213,7 +214,8 @@ async getUserPosts(user_id) {
             language: post.language,
             post_date: post.post_date,
             user_id: post.user_id,
-            user_nickname: post.user_nickname
+            user_nickname: post.user_nickname,
+            profile_picture: `${post.profile_picture}`
         }));
     } catch (error) {
         console.error("사용자 게시물을 가져오는 중 에러 발생:", error);
@@ -229,11 +231,11 @@ async getUserFeedback(user_id) {
 
         // feedback 테이블과 post 테이블을 조인하여 post_id, post_title, user_id, nickname, post_date, feedback_date, language을 가져오는 쿼리
         const [feedbacks] = await connection.query(
-            `SELECT p.post_id, p.post_title, u.user_id, u.user_nickname as nickname, p.post_date, f.feedback_date, p.language
+            `SELECT p.post_id, p.post_title, u.user_id, u.user_nickname as nickname, p.post_date, f.feedback_date, p.language,u.user_image AS profile_picture
              FROM feedback f
              JOIN post p ON f.post_id = p.post_id 
              JOIN user u ON p.user_id = u.user_id
-             WHERE f.user_id = ?`,
+             WHERE f.user_id = ? order by p.post_date DESC`,
             [user_id]
         );
 
@@ -251,7 +253,8 @@ async getUserFeedback(user_id) {
             nickname: feedback.nickname,
             post_date: feedback.post_date,
             feedback_date: feedback.feedback_date,
-            language: feedback.language
+            language: feedback.language,
+            profile_picture: `${feedback.profile_picture}`
         }));
     } catch (error) {
         console.error("사용자 피드백을 가져오는 중 에러 발생:", error);
