@@ -24,8 +24,8 @@ const adminRouter = require('./adminRouter');
 // 환경 변수 설정
 dotenv.config({ path: './src/routes/.env' });
 
-// Passport 설정 파일 로드
-// require('../../config/passport-setup');
+// Passport 설정 파일 로드, 이제 삭제할 것임
+require('../../config/passport-setup');
 
 const app = express();
 
