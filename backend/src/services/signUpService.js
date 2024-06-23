@@ -59,4 +59,26 @@ const emailCheck = async(email, res) => {
     res.status(500).send({success: false});
   }
 }
-module.exports = { signUp,create_code ,emailCheck};
+
+const findUser = async(email) => {
+  let sql = `select user_id, user_email from user where user_email = ?`;
+
+  try{ 
+
+    let [result] = await pool.query(sql, [email]);
+
+    return result;
+  }catch{error}
+  {
+    console.log(error);
+  }
+}
+
+const googleSign = async (displayName, email) => {
+  let sql = `INSERT INTO user (user_name, user_nickname, user_email, user_password, user_salt, role) VALUES (?, ?, ?, ?, ?, ?)`;
+  
+  let [result] = await pool.query(sql, [displayName, displayName, email, "defaultPassword", "defaultSalt", 0]);
+
+  return result;
+}
+module.exports = { signUp,create_code ,emailCheck,findUser,googleSign};

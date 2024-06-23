@@ -43,7 +43,6 @@ class UserController {
     }
   
     try {
-     
   
       // Modify user info without image
       const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
@@ -62,11 +61,12 @@ class UserController {
     const user_id = req.params.user_id;
   
     try {
+  
       let imageFileName = null;
       if (req.file && req.file.buffer) {
         const fileName = `${user_id}_${Date.now()}.png`;
-        const filePath = path.join(__dirname, '../../../../front/front/public/images/', fileName);
-  
+        const filePath = path.join(__dirname, '../../../../front/front/front/public/images/', fileName);
+
         // 이미지를 파일로 저장
         await fs.promises.writeFile(filePath, req.file.buffer);
   
@@ -128,6 +128,16 @@ class UserController {
       }
       res.status(500).json({ message: "사용자 피드백을 가져오는 중 에러 발생" });
     }
+  }
+
+  async DeleteUserImage(req, res) {
+    const before_image_path = req.body.preimage;
+    const image_path = path.join(__dirname,'../../../../front/front/front/public/', `${before_image_path})`);
+    
+    fs.promises.unlink(image_path);
+
+    res.status(200).send({success: true})
+
   }
 }
 

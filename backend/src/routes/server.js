@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require('body-parser');
-const passport = require('passport');
+// const passport = require('passport');
 const session = require('express-session');
 const signUpRouter = require("./signUpRouter");
 const loginRouter = require("./loginRouter");
@@ -24,7 +24,7 @@ const adminRouter = require('./adminRouter');
 // 환경 변수 설정
 dotenv.config({ path: './src/routes/.env' });
 
-// Passport 설정 파일 로드
+// Passport 설정 파일 로드, 이제 삭제할 것임
 require('../../config/passport-setup');
 
 const app = express();
@@ -44,8 +44,8 @@ app.use(session({
 }));
 
 // Passport 초기화 및 세션 사용
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 app.use("/sign", signUpRouter);
 app.use("/login", loginRouter);

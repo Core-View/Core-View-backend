@@ -1,6 +1,6 @@
 // src/routes/top3FeedbackRouter.js
 const express = require('express');
-const feedbackController = require('../controllers/top3FeedbackControllers');
+const feedbackController = require('../controllers/top3FeedbackController');
 
 const router = express.Router();
 
