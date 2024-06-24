@@ -215,7 +215,7 @@ exports.getTop3Contributors = async (req, res) => {
   FROM user
   WHERE role = 0
   ORDER BY user_contribute DESC
-  LIMIT 3;
+  ;
   `;
 
   try {
