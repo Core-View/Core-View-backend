@@ -14,7 +14,7 @@ exports.getTop3Feedback = async (req, res) => {
     WHERE f.feedback_date >= ? AND u.role = 0
     GROUP BY f.feedback_id, u.user_contribute, u.user_nickname
     ORDER BY total_likes DESC
-    LIMIT 3;
+    ;
   `;
 
   try {

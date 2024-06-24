@@ -15,7 +15,7 @@ exports.getTop3Posts = async (req, res) => {
     WHERE p.post_date >= ? AND u.role = 0
     GROUP BY p.post_id, u.user_contribute, u.user_nickname
     ORDER BY total_likes DESC
-    LIMIT 3;
+    ;
   `;
 
   try {

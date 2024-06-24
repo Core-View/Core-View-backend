@@ -34,10 +34,10 @@ const forgotPassword = async (req, res) => {
 
         await sendMail(user_email, "<Core-view> 비밀번호 재설정 코드", html, res);
 
-        return res.status(200).json({ success: true, message: "이메일로 인증 코드가 전송되었습니다." });
+        //return res.status(200).json({ success: true, message: "이메일로 인증 코드가 전송되었습니다." });
     } catch (error) {
         console.error("비밀번호 재설정 오류:", error);
-        return res.status(500).json({ success: false, message: "서버 에러가 발생했습니다." });
+        //return res.status(500).json({ success: false, message: "서버 에러가 발생했습니다." });
     }
 };
 
