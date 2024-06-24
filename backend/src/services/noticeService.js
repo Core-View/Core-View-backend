@@ -71,7 +71,7 @@ const postNotice = async (req, res) => {
 }
 
 const getUser = async (req, res) => {
-    let sql = `SELECT USER_ID, USER_NAME, USER_NICKNAME, USER_EMAIL, USER_CONTRIBUTE FROM USER`;
+    let sql = `SELECT USER_ID, USER_NAME, USER_NICKNAME, USER_EMAIL, USER_CONTRIBUTE FROM USER where role = 0`;
 
     try{
         const [result] = await pool.query(sql);

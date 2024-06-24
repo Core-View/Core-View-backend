@@ -5,6 +5,16 @@ const fs = require('fs');
 
 const tempDir = os.tmpdir();
 
+// Java 클래스 이름 추출 함수
+function extractJavaClassName(code) {
+    const classNameMatch = code.match(/class\s+([A-Za-z_][A-Za-z0-9_]*)\s*/);
+    if (classNameMatch) {
+        return classNameMatch[1];
+    } else {
+        throw new Error('Java class name not found');
+    }
+}
+
 // C 코드 실행 함수
 function runCCode(code) {
     return new Promise((resolve, reject) => {
