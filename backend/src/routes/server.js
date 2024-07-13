@@ -2,27 +2,25 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require('body-parser');
-// const passport = require('passport');
 const session = require('express-session');
-const signUpRouter = require("./signUpRouter");
-const loginRouter = require("./loginRouter");
-const logoutRouter = require("./logoutRouter");
+const signUpRouter = require("./signup/signUpRouter");
+const loginRouter = require("./signin/loginRouter");
+const logoutRouter = require("./signin/logoutRouter");
 const profileRouter = require('./profileRouter');
-const virtualCompilerRouter = require('./virtualCompilerRouter');
-const mypageRouter = require("./mypageRouter");
-const postRouter = require("./postRouter");
-const top3PostsRouter = require("./top3PostsRouter");
-const top3FeedbackRouter = require("./top3FeedbackRouter");
-const resetPasswordRouter = require("./resetPasswordRouter");
-const passwordRouter = require('./passwordRouter');
-const feedbackRouter = require('./feedbackRouter');
-const noticeRouter = require("./noticeRouter");
-const alarmRouter = require('./alarmRouter');
-const adminRouter = require('./adminRouter');
-// const homeRouter = require('./homeRouter'); // 홈 페이지 라우터 추가(소셜계정 테스트용, 삭제 하셔도 됩니다)
-
+const virtualCompilerRouter = require('./post/virtualCompilerRouter');
+const mypageRouter = require("./mypage/mypageRouter");
+const postRouter = require("./post/postRouter");
+const top3PostsRouter = require("./post/top3PostsRouter");
+const top3FeedbackRouter = require("./feedback/top3FeedbackRouter");
+const resetPasswordRouter = require("./signin/resetPasswordRouter");
+const passwordRouter = require('./mypage/passwordRouter');
+const feedbackRouter = require('./feedback/feedbackRouter');
+const noticeRouter = require("./notice/noticeRouter");
+const alarmRouter = require('./alarm/alarmRouter');
+const adminRouter = require('./admin/adminRouter');
+const redisClient = require('../../config/redisSet')
 // 환경 변수 설정
-dotenv.config({ path: './src/routes/.env' });
+dotenv.config();
 
 const app = express();
 
@@ -40,9 +38,6 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// Passport 초기화 및 세션 사용
-// app.use(passport.initialize());
-// app.use(passport.session());
 
 app.use("/sign", signUpRouter);
 app.use("/login", loginRouter);
@@ -58,7 +53,6 @@ app.use("/", resetPasswordRouter);
 app.use('/notice', noticeRouter);
 app.use('/sse/streaming', alarmRouter);
 app.use('/password', passwordRouter);
-// app.use('/', homeRouter); // 홈 페이지 라우터 사용(구글 소셜로그인 테스트용 삭제 해주셔도 됩니다)
 
 app.use('/api', feedbackRouter);
 
@@ -71,3 +65,13 @@ app.use((err, req, res, next) => {
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
+
+//redis 연결
+redisClient.on('connect', () => {
+	console.info('Redis connected!');
+});
+redisClient.on('error', (err) => {
+	console.error('Redis Client Error', err);
+});
+redisClient.connect().then(); // redis v4 연결 (비동기)
+const redisCli = redisClient.v4;
