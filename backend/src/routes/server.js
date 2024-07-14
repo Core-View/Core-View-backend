@@ -18,8 +18,6 @@ const feedbackRouter = require('./feedback/feedbackRouter');
 const noticeRouter = require("./notice/noticeRouter");
 const alarmRouter = require('./alarm/alarmRouter');
 const adminRouter = require('./admin/adminRouter');
-const redisClient = require('../../config/redisSet')
-const refresh = require('../../auth/jwt-util')
 
 // 환경 변수 설정
 dotenv.config();
@@ -58,7 +56,7 @@ app.use('/password', passwordRouter);
 app.use('/api', feedbackRouter);
 
 //리프레시 토큰 재요청
-app.use('/refresh', refresh.refresh)
+app.use('/token', loginRouter)
 
 // 에러 핸들링 미들웨어 추가
 app.use((err, req, res, next) => {
