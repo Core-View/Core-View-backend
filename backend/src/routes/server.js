@@ -19,9 +19,11 @@ const noticeRouter = require("./notice/noticeRouter");
 const alarmRouter = require('./alarm/alarmRouter');
 const adminRouter = require('./admin/adminRouter');
 const redisClient = require('../../config/redisSet')
+const refresh = require('../../auth/jwt-util')
+
 // 환경 변수 설정
 dotenv.config();
-
+console.log(process.env.DB_USER)
 const app = express();
 
 
@@ -53,8 +55,10 @@ app.use("/", resetPasswordRouter);
 app.use('/notice', noticeRouter);
 app.use('/sse/streaming', alarmRouter);
 app.use('/password', passwordRouter);
-
 app.use('/api', feedbackRouter);
+
+//리프레시 토큰 재요청
+app.use('/refresh', refresh.refresh)
 
 // 에러 핸들링 미들웨어 추가
 app.use((err, req, res, next) => {
@@ -65,13 +69,3 @@ app.use((err, req, res, next) => {
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
-
-//redis 연결
-redisClient.on('connect', () => {
-	console.info('Redis connected!');
-});
-redisClient.on('error', (err) => {
-	console.error('Redis Client Error', err);
-});
-redisClient.connect().then(); // redis v4 연결 (비동기)
-const redisCli = redisClient.v4;

@@ -8,4 +8,14 @@ const redisClient = redis.createClient({
 	legacyMode: true
 });
 
-module.exports = redisClient;
+//redis 연결
+redisClient.on('connect', () => {
+	console.info('Redis connected!');
+});
+redisClient.on('error', (err) => {
+	console.error('Redis Client Error', err);
+});
+redisClient.connect().then(); // redis v4 연결 (비동기)
+const redisCli = redisClient.v4;
+
+module.exports = redisCli;
