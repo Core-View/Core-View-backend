@@ -24,14 +24,16 @@
     "querystring": "^0.2.1",
     "redis": "^4.6.15",
     "sequelize": "^6.37.3",
-    "update": "^0.7.4"
+    "update": "^0.7.4",
+    "util": "^0.12.5"
   },
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/routes/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "mailer": "node mailer.js"
+    "mailer": "node mailer.js",
+    "dev": "nodemon src/routes/server.js"
   },
   "tls": {
     "rejectUnauthorized": false
