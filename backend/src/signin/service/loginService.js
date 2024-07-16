@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const { comparePassword } = require('../../utils/cryptoUtils');
 const pool = require('../../../config/databaseSet');
+const redisCl = require('../../../config/redisSet')
+const jwt = require('../../../auth/jwt-util')
 
 // 로그인 인증 함수
 const authenticate = async (user_email, inputPassword) => {
@@ -14,7 +16,6 @@ const authenticate = async (user_email, inputPassword) => {
 
     const user = rows[0];
 
-
     // 저장된 해시된 비밀번호와 입력된 비밀번호 비교
     const isMatch = await comparePassword(inputPassword, user.user_password, user.user_salt);
 
@@ -23,13 +24,20 @@ const authenticate = async (user_email, inputPassword) => {
       return { success: false, error: "비밀번호가 일치하지 않습니다." };
     }
 
-    console.log("비밀번호 비교 결과:", isMatch);
+    /**
+     * 토큰 생성
+     */
+    const accessToken = "Bearer " + jwt.sign(user.user_id);
+    const refreshToken = jwt.refresh();
+
+    redisCl.set(user.user_id.toString(), refreshToken);
 
     // 인증 성공 시 사용자 정보 반환
     return {
       success: true,
       user_id: user.user_id,
-      role : user.role
+      role : user.role,
+      Authorizaiton: accessToken
       // 필요한 경우 추가 정보 반환
     };
   } catch (err) {

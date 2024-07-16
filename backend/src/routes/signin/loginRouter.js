@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const loginController = require("../../signin/controller/loginController");
-const token = require('../../../auth/jwt-util')
+const token = require('../../../auth/refreshCheck')
 
 router.post("/", loginController.login);
 
