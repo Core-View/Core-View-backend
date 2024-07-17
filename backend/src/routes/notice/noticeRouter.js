@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const noticeController = require("../../notice/controller/noticeController");
 const multer = require('multer');
+const {authAdminJWT} = require('../../../auth/jwtMiddle')
 
 const noticeImage = multer.diskStorage({
 	// (2)
@@ -30,29 +31,26 @@ const upload = multer({
 });
 
 //조회
-router.get("/view", noticeController.noticeView);
+router.get("/view", authAdminJWT, noticeController.noticeView);
 
 //상세조회
 router.get("/view/:id", noticeController.noticeDetail);
 
 //삭제
-router.delete("/delete/:id", noticeController.noticeDelete);
+router.delete("/post", authAdminJWT, noticeController.noticeDelete);
 
 //수정
-router.patch("/post", noticeController.noticeModify);
+router.patch("/post", authAdminJWT, noticeController.noticeModify);
 
 //작성
-router.post("/post", noticeController.noticePost);
+router.post("/post", authAdminJWT, noticeController.noticePost);
+
+
+router.get("/viewuser", authAdminJWT, noticeController.noticeUser);
 
 //이미지 첨부
-// router.post("image", upload.single('image'), (req, res) => {
-//     res.status(200).json(req.file); //파일 경로 전송
-// })
-
-router.get("/viewuser", noticeController.noticeUser);
-
 router.post("/image", upload.single('image'), (req, res) => {
-    res.status(200).send({hi:"hello"});
+    res.status(200).send({success: true});
 });
 
 module.exports = router;

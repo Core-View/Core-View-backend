@@ -2,8 +2,6 @@ const adminService = require('../service/adminService');
 
 class AdminController {
     async login(req, res) {
-        const { user_id } = req.params;
-        const { admin_password } = req.body;
 
         try {
             if (!admin_password) {

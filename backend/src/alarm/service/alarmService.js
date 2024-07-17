@@ -47,7 +47,7 @@ async function checkAlarm (req, res) {
     let sql = `UPDATE alarm set alarm_check = 1 where alarm_check = 0 and user_id = ?`;
 
     try{
-        await pool.query(sql, [req.body.user_id]);
+        await pool.query(sql, [req.userId]);
     }catch(error){
         console.log(error);
 

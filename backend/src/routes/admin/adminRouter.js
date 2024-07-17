@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../../admin/controller/adminController");
+const {authAdminJWT} = require('../../../auth/jwtMiddle')
 
-router.post("/login/:user_id", adminController.login);
+router.post("/login", authAdminJWT, (req, res) => {
+    res.status(200).send({success: true, message: "관리자 인증 성공"})
+});
 
 module.exports = router;

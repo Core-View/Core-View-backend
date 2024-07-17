@@ -27,7 +27,7 @@ const authenticate = async (user_email, inputPassword) => {
     /**
      * 토큰 생성
      */
-    const accessToken = "Bearer " + jwt.sign(user.user_id);
+    const accessToken = "Bearer " + jwt.sign(user.user_id, user.role);
     const refreshToken = jwt.refresh();
 
     redisCl.set(user.user_id.toString(), refreshToken);
@@ -35,9 +35,7 @@ const authenticate = async (user_email, inputPassword) => {
     // 인증 성공 시 사용자 정보 반환
     return {
       success: true,
-      user_id: user.user_id,
-      role : user.role,
-      Authorizaiton: accessToken
+      Authorization: accessToken
       // 필요한 경우 추가 정보 반환
     };
   } catch (err) {

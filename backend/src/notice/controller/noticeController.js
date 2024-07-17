@@ -12,7 +12,7 @@ const noticeDetail = (req, res) => {
 }
 
 const noticeDelete = (req, res) => {
-    let notice_id = req.params.id;
+    let notice_id = req.get('notice_id');
 
     noticeService.deleteNotice(notice_id, res);
 }

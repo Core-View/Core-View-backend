@@ -13,7 +13,7 @@ function refresh(req, res) {
 
 		// access token 디코딩하여 user의 정보 가져옴
 		const decoded = jwt.decode(authToken);
-
+		console.log("refresh",decoded)
 		// 디코딩 결과가 없으면 권한이 없음을 응답.
 		if (decoded === null) {
 			res.status(401).send({
@@ -37,7 +37,7 @@ function refresh(req, res) {
 				});
 			} else {
 				// 2. access token이 만료되고, refresh token은 만료되지 않은 경우 => 새로운 access token을 발급
-				const newAccessToken =  "Bearer " + sign(user);
+				const newAccessToken =  "Bearer " + sign(decoded.id, decoded.role);
 
 				res.status(200).send({
 					success: true,
