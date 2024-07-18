@@ -8,7 +8,7 @@ class SSEController {
     }
 
     async subscribe(req, res) {
-        let user_id = req.params.user_id;
+        let user_id = req.userId;
 
         const headers = {
             'Access-Control-Allow-Origin': '*',

@@ -1,6 +1,8 @@
 const signUpService = require("../service/signUpService");
 const loginService = require("../../signin/service/loginService");
 const mailer = require("./mailer");
+const redisCl = require("../../../config/redisSet")
+
 //회원가입 컨트롤러
 const signUp = async (req, res) => {
   const { user_name,user_nickname, user_email, user_password } = req.body;
@@ -38,7 +40,8 @@ const auth = async (req, res) => {
       `<p>이메일 인증코드입니다. ${code}를 입력해주세요</p>`, res
     );
 
-    req.session[email] = code;
+    //레디스에 인증번호 저장
+    redisCl.set(email,code);
 
     // res.status(200).send({ success: true});
   } catch (error) {
@@ -50,11 +53,12 @@ const auth = async (req, res) => {
 const emailCheck = (req, res) => {
   let user_code = req.body.authcode;
   let email = req.body.email;
+  let authCode = redisCl.get(email);
 
-  if (req.session[email] != user_code) {
+  if (authCode != user_code) {
     res.status(200).send({ success: false, message: user_code });
   } else {
-    delete req.session.user_email;
+    redisCl.del(email)
     res.status(200).send({ success: true, message: "인증번호가 일치합니다." });
   }
 };

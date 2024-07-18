@@ -50,7 +50,7 @@ const updateNotice = async (req, res) => {
     let sql = `UPDATE NOTICE SET NOTICE_TITLE = ?, NOTICE_CONTENT = ? WHERE NOTICE_ID = ?`;
   
     try {
-        const [result] = await pool.query(sql, [req.body.notice_title, req.body.notice_content, req.body.notice_id]);
+        const [result] = await pool.query(sql, [req.body.notice_title, req.body.notice_content, req.get('notice_id')]);
         res.status(200).send({success: true});
     } catch (error) {
         console.log(error);
