@@ -15,17 +15,12 @@ const login = async (req, res) => {
     if (user && user.success) {
       res.status(200).send({
         user_id: user.user_id,
-        role : user.role,
-        Authorizaiton: user.Authorizaiton,
-        // Add other necessary information, but do not include sensitive data like user_password
+        role: user.role,
+        Authorization: user.Authorization, // 오타 수정
         message: "로그인이 성공적으로 처리되었습니다.",
       });
     } else {
-      res
-        .status(401)
-        .send(
-          "인증에 실패하였습니다. 올바른 사용자 이름과 비밀번호를 입력해주세요."
-        );
+      res.status(401).send("인증에 실패하였습니다. 올바른 사용자 이름과 비밀번호를 입력해주세요.");
     }
   } catch (error) {
     console.error("인증 중 오류 발생:", error);
