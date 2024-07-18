@@ -5,7 +5,8 @@ const alarmService = require('../../alarm/service/alarmService');
 
 // 피드백 생성
 exports.createFeedback = async (req, res) => {
-  const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
+  const { post_id, feedback_comment, feedback_codenumber } = req.body;
+  const user_id = req.userId; // JWT에서 가져온 userId
   
   try {
     // user_id로 user_nickname 조회
@@ -90,7 +91,9 @@ exports.getFeedbackById = async (req, res) => {
 // 피드백 수정
 exports.updateFeedback = async (req, res) => {
   const id = req.params.id;
-  const { post_id, user_id, feedback_comment, feedback_codenumber } = req.body;
+  const { post_id, feedback_comment, feedback_codenumber } = req.body;
+  const user_id = req.userId; // JWT에서 가져온 userId
+  
   try {
     // user_id로 user_nickname 조회
     const [userRows] = await pool.query('SELECT user_nickname FROM user WHERE user_id = ?', [user_id]);
@@ -146,7 +149,9 @@ exports.deleteFeedback = async (req, res) => {
 
 // 피드백 좋아요 생성
 exports.createFeedbackLike = async (req, res) => {
-  const { user_id, feedback_id } = req.body;
+  const { feedback_id } = req.body;
+  const user_id = req.userId; // JWT에서 가져온 userId
+  
   try {
     const query = 'INSERT INTO feedback_likes (user_id, feedback_id) VALUES (?, ?)';
     const [result] = await pool.query(query, [user_id, feedback_id]);
@@ -170,6 +175,8 @@ exports.createFeedbackLike = async (req, res) => {
 // 피드백 좋아요 삭제
 exports.deleteFeedbackLike = async (req, res) => {
   const id = req.params.id;
+  const user_id = req.userId; // JWT에서 가져온 userId
+
   try {
     //피드백 작성한 유저의 아이디 가져오기
     let sql = `SELECT user_id from feedback where feedback_id = ?`; 

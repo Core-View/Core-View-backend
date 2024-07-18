@@ -60,7 +60,6 @@ exports.unlikePost = async (req, res) => {
   `;
 
   try {
-  
     await pool.query(sqlQuery, [post_id, user_id]);
     res.status(200).json({ message: '포스트 좋아요가 성공적으로 취소되었습니다.' });
   } catch (err) {
@@ -105,7 +104,6 @@ exports.getPostsByDate = async (req, res) => {
   `;
 
   try {
-   
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
@@ -135,7 +133,6 @@ exports.getPostsByLikes = async (req, res) => {
   `;
 
   try {
- 
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
@@ -166,7 +163,6 @@ exports.getRecent3Posts = async (req, res) => {
   `;
 
   try {
-   
     const [results] = await pool.query(sqlQuery);
     res.json(results);
   } catch (err) {
@@ -186,7 +182,6 @@ exports.getUserContribution = async (req, res) => {
   `;
 
   try {
-
     const [[userContributionResult]] = await pool.query(userContributionQuery, [user_id]);
 
     if (!userContributionResult) {
@@ -215,7 +210,6 @@ exports.getTop3Contributors = async (req, res) => {
   FROM user
   WHERE role = 0
   ORDER BY user_contribute DESC
-  ;
   `;
 
   try {
@@ -298,6 +292,3 @@ exports.getPostDetails = async (req, res) => {
     res.status(500).json({ error: '데이터베이스 오류' });
   }
 };
-
-
-

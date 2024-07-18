@@ -8,7 +8,7 @@ const { access } = require('fs');
 
 class UserController {
   async getUser(req, res) {
-    const user_id = req.params.user_id;
+    const user_id = req.userId;
     try {
       const userInfo = await userService.getUserInfoByUserId(user_id);
       res.json(userInfo);
@@ -22,7 +22,7 @@ class UserController {
   }
   
   async getLikedPosts(req, res) {
-    const { user_id } = req.params;
+    const { user_id } = req.userId;
 
     try {
         console.log(`사용자 ID: ${user_id} - 좋아요 누른 게시물 요청 수신`);
@@ -36,7 +36,7 @@ class UserController {
 }
   
   async modifyUser(req, res) {
-    const user_id = req.params.user_id;
+    const user_id = req.userId;
     const { user_nickname, user_password, user_password_confirm, user_intro } = req.body;
   
     if (user_password !== user_password_confirm) {
@@ -59,7 +59,7 @@ class UserController {
   }
   
   async modifyUserImage(req, res) {
-    const user_id = req.params.user_id;
+    const user_id = req.userId;
   
     try {
       let imageFileName = null;
@@ -85,7 +85,7 @@ class UserController {
   }
   
   async deleteUser(req, res) {
-    const user_id = req.params.user_id;
+    const user_id = req.userId;
 
     try {
       await userService.deleteUserById(user_id);
@@ -100,7 +100,7 @@ class UserController {
   }
 
   async getUserPosts(req, res) {
-    const user_id = req.params.user_id;
+    const user_id = req.userId;
 
     try {
       const posts = await userService.getUserPosts(user_id);
@@ -115,7 +115,7 @@ class UserController {
   }
 
   async getUserFeedback(req, res) {
-    const user_id = req.params.user_id;
+    const user_id = req.userId;
 
     try {
       const feedbacks = await userService.getUserFeedback(user_id);

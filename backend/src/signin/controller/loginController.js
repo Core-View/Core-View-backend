@@ -15,15 +15,10 @@ const login = async (req, res) => {
     if (user && user.success) {
       res.status(200).send({
         Authorization: user.Authorization,
-        // Add other necessary information, but do not include sensitive data like user_password
         message: "로그인이 성공적으로 처리되었습니다.",
       });
     } else {
-      res
-        .status(401)
-        .send(
-          "인증에 실패하였습니다. 올바른 사용자 이름과 비밀번호를 입력해주세요."
-        );
+      res.status(401).send("인증에 실패하였습니다. 올바른 사용자 이름과 비밀번호를 입력해주세요.");
     }
   } catch (error) {
     console.error("인증 중 오류 발생:", error);
