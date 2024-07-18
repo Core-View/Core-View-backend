@@ -28,7 +28,7 @@ const authGetJWT = (req, res, next) => {
 };
 
 const authAdminJWT = (req, res, next) => {
-
+	console.log(req)
 	try{
 		if(req.get('Authorization')) {
 			const token = req.get('Authorization').split('Bearer ') [1];
