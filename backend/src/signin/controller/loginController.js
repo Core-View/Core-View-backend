@@ -15,6 +15,7 @@ const login = async (req, res) => {
     if (user && user.success) {
       res.status(200).send({
         Authorization: user.Authorization,
+        role: user.role,
         message: "로그인이 성공적으로 처리되었습니다.",
       });
     } else {

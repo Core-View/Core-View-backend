@@ -35,7 +35,8 @@ const authenticate = async (user_email, inputPassword) => {
     // 인증 성공 시 사용자 정보 반환
     return {
       success: true,
-      Authorization: accessToken
+      Authorization: accessToken,
+      role: user.role
       // 필요한 경우 추가 정보 반환
     };
   } catch (err) {

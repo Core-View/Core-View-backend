@@ -51,9 +51,9 @@ const auth = async (req, res) => {
 };
 
 const emailCheck = (req, res) => {
-  let user_code = req.body.authcode;
-  let email = req.body.email;
-  let authCode = redisCl.get(email);
+  let user_code = req.body.user_authcode;
+  let email = req.body.user_email;
+  let authCode = redisCl.get(email.toString());
 
   if (authCode != user_code) {
     res.status(200).send({ success: false, message: user_code });
