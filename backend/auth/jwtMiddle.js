@@ -34,7 +34,7 @@ const authAdminJWT = (req, res, next) => {
 		if(req.get('Authorization')) {
 			const token = req.get('Authorization').split('Bearer ') [1];
 			const result = verify(token);
-			console.log(result)
+	
 			if (result.ok) {
 				if(result.role != 1){
 					res.status(403).send({

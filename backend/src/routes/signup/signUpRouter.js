@@ -50,18 +50,25 @@ router.get('/google/callback', async (req, res) => {
       let user = await signUpService.findUser(email);
   
       let accessToken;
+
+      //회원정보 존재 여부 확인
       if(user.length === 0){
+
+        //회원이 존재하지 않을 때 db에 저장 후 토큰 발급
         let result = await signUpService.googleSign(name,email,picture);
         
         accessToken = "Bearer " + jwt.sign(result.insertId, user.role);
         const refreshToken = jwt.refresh();
   
-      redisCl.set(result.insertId.toString(), refreshToken);
+        redisCl.set(result.insertId.toString(), refreshToken);
+
       }else{
+
         accessToken = "Bearer " + jwt.sign(user[0].user_id, user.role);
         const refreshToken = jwt.refresh();
     
         redisCl.set(user[0].user_id.toString(), refreshToken);
+
       }
 
       res.cookie("accessToken", accessToken, { path: '/',  secure: false });

@@ -3,8 +3,6 @@ const loginService = require("../service/loginService");
 const login = async (req, res) => {
   const { user_email, user_password } = req.body;
 
-  console.log("로그인 시도:", user_email, user_password);
-
   if (!user_email || !user_password) {
     return res.status(400).send("이메일과 비밀번호를 모두 입력해주세요.");
   }

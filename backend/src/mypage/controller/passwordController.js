@@ -1,7 +1,7 @@
 const passwordService = require('../service/passwordService');
 
 async function verifyPassword(req, res) {
-    const { user_id } = req.userId;
+    const user_id = req.userId;
     const { user_password } = req.body; // 요청 바디에서 user_password를 가져옴
 
     try {

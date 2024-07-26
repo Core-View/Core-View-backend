@@ -1,5 +1,5 @@
 const pool = require('../../../config/databaseSet');
-
+const noticeService = require('../../notice/service/noticeService')
 // 좋아요를 받는 함수
 exports.likePost = async (req, res) => {
   const { post_id, user_id } = req.body; // 요청 본문에서 post_id와 user_id 가져오기

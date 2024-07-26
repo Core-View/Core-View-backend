@@ -27,7 +27,7 @@ module.exports = {
 		let decoded = null;
 		try {
 			decoded = jwt.verify(token, secret);
-			console.log("jwt-util", decoded)
+
 			return {
 				ok: true,
 				id: decoded.id,
