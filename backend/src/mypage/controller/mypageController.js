@@ -137,9 +137,17 @@ class UserController {
       res.status(200).send({access: true});
       return;
     }else{
+
       const image_path = path.join(__dirname,'../../../../front/front/front/public/', `${before_image_path}`);
     
-      await fs.unlink(image_path);
+      //파일 존재 여부 확인
+      fs.exists((image_path), async(exists) => {
+        if(exists){
+          await fs.unlink(image_path);
+        }else{
+          return;
+        }
+      });
   
       res.status(200).send({access: true})
     }

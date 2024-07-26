@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const signUpController = require("../../signup/controller/signUpController");
-const passport = require('passport'); // 추가된 부분
 const axios = require('axios');
 const querystring = require('querystring');
 const signUpService = require('../../signup/service/signUpService');
+const redisCl = require('../../../config/redisSet')
+const jwt = require('../../../auth/jwt-util')
 
 require('dotenv').config();
 // 회원가입 또는 로그인
@@ -44,18 +45,21 @@ router.get('/google/callback', async (req, res) => {
 
       // 사용자 정보 가져오기
       const userInfoResponse = await axios.get(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${access_token}`);
-      const { name, email } = userInfoResponse.data;
+      const { name, email, picture } = userInfoResponse.data;
 
       let user = await signUpService.findUser(email);
 
+      const accessToken = "Bearer " + jwt.sign(user.user_id, user.role);
+      const refreshToken = jwt.refresh();
+  
+      redisCl.set(user.user_id.toString(), refreshToken);
+
       if(user.length === 0){
-        let result = await signUpService.googleSign(name,email);
-        res.cookie("user_id", result.insertId, { path: '/', secure: false });
-        res.cookie("role", 0, { path: '/',  secure: false });
-      }else{
-        res.cookie("user_id", user[0].user_id, { path: '/',  secure: false });
-        res.cookie("role", 0, { path: '/',  secure: false });
+        let result = await signUpService.googleSign(name,email,picture);
       }
+
+      res.cookie("Authorization", accessToken, { path: '/',  httpOnly: true, secure: false });
+      res.cookie("role", 2, { path: '/', httpOnly: true, secure: false });
 
       res.redirect('http://localhost:3001');
     }catch(error){
