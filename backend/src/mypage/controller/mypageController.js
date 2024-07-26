@@ -11,7 +11,7 @@ class UserController {
     const user_id = req.userId;
     try {
       const userInfo = await userService.getUserInfoByUserId(user_id);
-      res.json(userInfo);
+      res.json({success: true, userInfo});
     } catch (error) {
       console.error("사용자 정보를 가져오는 중 에러 발생:", error);
       if (error.message === "사용자를 찾을 수 없음") {
@@ -28,7 +28,7 @@ class UserController {
         console.log(`사용자 ID: ${user_id} - 좋아요 누른 게시물 요청 수신`);
         const likedPosts = await userService.getLikedPosts(user_id);
         console.log("좋아요를 누른 게시물:", likedPosts);
-        res.status(200).json(likedPosts);
+        res.status(200).json({success: true, likedPosts});
     } catch (error) {
         console.error("좋아요를 누른 게시물 정보를 가져오는 중 에러 발생:", error);
         res.status(500).json({ error: error.message });
@@ -48,7 +48,7 @@ class UserController {
   
       // Modify user info without image
       const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
-      return res.json(updatedUserInfo);
+      return res.json({success: true, updatedUserInfo});
     } catch (error) {
       console.error("사용자 정보 수정 중 에러 발생:", error);
       if (error.message === "사용자를 찾을 수 없음") {
@@ -74,7 +74,7 @@ class UserController {
       }
       const updatedUserImage = await userService.modifyUserImage(user_id, imageFileName);
   
-      res.json(updatedUserImage);
+      res.json({success: true, updatedUserImage});
     } catch (error) {
       console.error("사용자 이미지 수정 중 에러 발생:", error);
       if (error.message === "사용자를 찾을 수 없음") {
@@ -104,7 +104,7 @@ class UserController {
 
     try {
       const posts = await userService.getUserPosts(user_id);
-      res.json(posts);
+      res.json({success: true, posts});
     } catch (error) {
       console.error("사용자 게시물을 가져오는 중 에러 발생:", error);
       if (error.message === "게시물을 찾을 수 없음") {
@@ -119,7 +119,7 @@ class UserController {
 
     try {
       const feedbacks = await userService.getUserFeedback(user_id);
-      res.json(feedbacks);
+      res.json({success: true,feedbacks});
     } catch (error) {
       console.error("사용자 피드백을 가져오는 중 에러 발생:", error);
       if (error.message === "피드백을 찾을 수 없음") {
@@ -134,7 +134,7 @@ class UserController {
     const before_image_path = req.body.preimage;
 
     if(before_image_path == 'null' || before_image_path === ''){
-      res.status(200).send({access: true});
+      res.status(200).send({success: true});
       return;
     }else{
 
@@ -149,7 +149,7 @@ class UserController {
         }
       });
   
-      res.status(200).send({access: true})
+      res.status(200).send({success: true})
     }
   }
 }
