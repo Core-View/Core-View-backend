@@ -48,18 +48,24 @@ router.get('/google/callback', async (req, res) => {
       const { name, email, picture } = userInfoResponse.data;
 
       let user = await signUpService.findUser(email);
-
-      const accessToken = "Bearer " + jwt.sign(user.user_id, user.role);
-      const refreshToken = jwt.refresh();
   
-      redisCl.set(user.user_id.toString(), refreshToken);
-
+      let accessToken;
       if(user.length === 0){
         let result = await signUpService.googleSign(name,email,picture);
+        
+        accessToken = "Bearer " + jwt.sign(result.insertId, user.role);
+        const refreshToken = jwt.refresh();
+  
+      redisCl.set(result.insertId.toString(), refreshToken);
+      }else{
+        accessToken = "Bearer " + jwt.sign(user[0].user_id, user.role);
+        const refreshToken = jwt.refresh();
+    
+        redisCl.set(user[0].user_id.toString(), refreshToken);
       }
 
-      res.cookie("Authorization", accessToken, { path: '/',  httpOnly: true, secure: false });
-      res.cookie("role", 2, { path: '/', httpOnly: true, secure: false });
+      res.cookie("accessToken", accessToken, { path: '/',  secure: false });
+      res.cookie("role", 2, { path: '/', secure: false });
 
       res.redirect('http://localhost:3001');
     }catch(error){
