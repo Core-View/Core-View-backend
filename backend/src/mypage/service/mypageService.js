@@ -228,6 +228,19 @@ async getUserFeedback(user_id) {
     }
 }
 
+async notPasswordUser(user_id, user_nickname, user_intro, res){
+
+    try{
+    const [result] = await pool.query(
+        "UPDATE user SET user_nickname = ?,  user_intro = ? WHERE user_id = ?", 
+        [user_nickname, user_intro, user_id]
+    );
+    }catch (error) {
+        console.log(error);
+        res.send({success:false, message: "사용자 정보 수정 중 오류가 발생했습니다."})
+    }
+}
+
 }
 
 module.exports = new UserService();

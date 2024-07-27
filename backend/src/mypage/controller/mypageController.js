@@ -37,18 +37,18 @@ class UserController {
   
   async modifyUser(req, res) {
     const user_id = req.userId;
-    const { user_nickname, user_password, user_password_confirm, user_intro } = req.body;
-  
-    if (user_password !== user_password_confirm) {
-      return res.status(400).json({ message: "비밀번호와 비밀번호 확인이 일치하지 않습니다." });
-    }
-  
+    const { user_nickname, user_password, user_intro } = req.body;
+
     try {
-     
-  
+      if(user_password === ""){
+        await userService.notPasswordUser(user_id,user_nickname, user_intro, res);
+      }else{
+        const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro);
+      }
+
       // Modify user info without image
-      const updatedUserInfo = await userService.modifyUserInfo(user_id, user_nickname, user_password, user_intro, null);
-      return res.json({success: true, updatedUserInfo});
+      
+      return res.json({success: true, message: "사용자 정보가 정상적으로 수정되었습니다."});
     } catch (error) {
       console.error("사용자 정보 수정 중 에러 발생:", error);
       if (error.message === "사용자를 찾을 수 없음") {
@@ -74,7 +74,7 @@ class UserController {
       }
       const updatedUserImage = await userService.modifyUserImage(user_id, imageFileName);
   
-      res.json({success: true, updatedUserImage});
+      res.send({success: true, message: "이미지가 변경되었습니다."});
     } catch (error) {
       console.error("사용자 이미지 수정 중 에러 발생:", error);
       if (error.message === "사용자를 찾을 수 없음") {
@@ -134,22 +134,19 @@ class UserController {
     const before_image_path = req.body.preimage;
 
     if(before_image_path == 'null' || before_image_path === ''){
-      res.status(200).send({success: true});
+      res.status(200).send({success: true, message: "이미지가 정상적으로 삭제되었습니다."});
       return;
     }else{
 
-      const image_path = path.join(__dirname,'../../../../front/front/front/public/', `${before_image_path}`);
-    
+      const image_path = path.join(__dirname,'../../../../../front/public', `${before_image_path}`);
+
       //파일 존재 여부 확인
-      fs.exists((image_path), async(exists) => {
-        if(exists){
-          await fs.unlink(image_path);
-        }else{
-          return;
-        }
-      });
-  
-      res.status(200).send({success: true})
+      if(await fs.access(image_path) === undefined){
+       
+        await fs.unlink(image_path);
+      }
+
+      res.status(200).send({success: true, message: "이미지가 정상적으로 삭제되었습니다."})
     }
   }
 }

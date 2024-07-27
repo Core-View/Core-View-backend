@@ -5,7 +5,7 @@ const controller = new SSEController();
 const alarmService = require('../../alarm/service/alarmService')
 const {authGetJWT} = require('../../../auth/jwtMiddle')
 
-router.get('/start/:user_id', authGetJWT,(req, res) => controller.subscribe(req, res));
+router.get('/start', authGetJWT,(req, res) => controller.subscribe(req, res));
 
 router.get('/stop', (req,res) => controller.unsubscribe(res));
 
