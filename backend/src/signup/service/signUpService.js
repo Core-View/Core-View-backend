@@ -74,10 +74,10 @@ const findUser = async(email) => {
   }
 }
 
-const googleSign = async (displayName, email, profile) => {
-  let sql = `INSERT INTO user (user_name, user_nickname, user_email, user_password, user_salt, user_image, role) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+const googleSign = async (displayName, email) => {
+  let sql = `INSERT INTO user (user_name, user_nickname, user_email, user_password, user_salt, role) VALUES (?, ?, ?, ?, ?, ?)`;
   
-  let [result] = await pool.query(sql, [displayName, displayName, email, "defaultPassword", "defaultSalt",profile, 2]);
+  let [result] = await pool.query(sql, [displayName, displayName, email, "defaultPassword", "defaultSalt", 2]);
 
   return result;
 }

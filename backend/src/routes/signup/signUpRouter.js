@@ -45,7 +45,7 @@ router.get('/google/callback', async (req, res) => {
 
       // 사용자 정보 가져오기
       const userInfoResponse = await axios.get(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${access_token}`);
-      const { name, email, picture } = userInfoResponse.data;
+      const { name, email } = userInfoResponse.data;
 
       let user = await signUpService.findUser(email);
   
@@ -55,7 +55,7 @@ router.get('/google/callback', async (req, res) => {
       if(user.length === 0){
 
         //회원이 존재하지 않을 때 db에 저장 후 토큰 발급
-        let result = await signUpService.googleSign(name,email,picture);
+        let result = await signUpService.googleSign(name,email);
         
         accessToken = "Bearer " + jwt.sign(result.insertId, user.role);
         const refreshToken = jwt.refresh();
