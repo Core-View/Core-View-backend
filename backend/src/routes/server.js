@@ -18,6 +18,7 @@ const feedbackRouter = require('./feedback/feedbackRouter');
 const noticeRouter = require("./notice/noticeRouter");
 const alarmRouter = require('./alarm/alarmRouter');
 const adminRouter = require('./admin/adminRouter');
+const naverAuthRouter = require('./signup/naverAuthRouter');
 
 // 환경 변수 설정
 dotenv.config();
