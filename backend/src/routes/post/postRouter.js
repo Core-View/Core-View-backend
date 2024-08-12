@@ -14,6 +14,6 @@ router.post('/contribution', authGetJWT, postController.getUserContribution); //
 router.get('/top-contributors', postController.getTop3Contributors); // 기여도가 높은 상위 3명의 사용자 가져오기
 router.get('/all-contributors', postController.getContributors); // 전체 기여도 가져오기
 router.get('/notice', postController.getNotice);
-router.get('/details/:post_id', postController.getPostDetails);
+router.get('/details/:post_id', authGetJWT, postController.getPostDetails);
 
 module.exports = router;

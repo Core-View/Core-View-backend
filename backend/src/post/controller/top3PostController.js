@@ -1,7 +1,7 @@
 // src/controllers/postController.js
 const pool = require('../../../config/databaseSet');
 
-// 최근 2주간의 게시물 중에서 좋아요가 많은 상위 3개를 가져오는 함수
+// 최근 2주간의 게시물 중에서 좋아요가 많은 게시글 가져오는 함수
 exports.getTop3Posts = async (req, res) => {  
   const twoWeeksAgo = new Date();
   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
